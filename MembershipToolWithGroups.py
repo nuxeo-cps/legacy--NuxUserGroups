@@ -26,7 +26,7 @@ __version__ = '$Revision$'[11:-2]
 from zLOG import LOG, INFO, DEBUG
 from AccessControl.PermissionRole import PermissionRole
 
-from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.permissions import View
 from Products.CMFCore.MembershipTool import MembershipTool
 
 LOG('NuxUserGroups.MembershipToolWithGroups', INFO, 'Patching MembershipTool')
