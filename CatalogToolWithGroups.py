@@ -164,6 +164,6 @@ try:
 except ImportError:
     try:
         import Products.NuxCPS3
-    else ImportError:
+    except ImportError:
         cmfpatch()
     # Not a CPS3 Installation, continue on with patching
