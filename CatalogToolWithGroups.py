@@ -64,12 +64,12 @@ def mergedLocalRoles(object, withgroups=0):
     return merged
 
 
-def allowedRolesAndUsers(self):
+# belongs to CPS API too
+def _allowedRolesAndUsers(ob):
     """
     Return a list of roles, users and groups with View permission.
     Used by PortalCatalog to filter out items you're not allowed to see.
     """
-    ob = self._IndexableObjectWrapper__ob # Eeek, manual name mangling
     allowed = {}
     for r in rolesForPermissionOn('View', ob):
         allowed[r] = 1
@@ -81,10 +81,19 @@ def allowedRolesAndUsers(self):
     if allowed.has_key('Owner'):
         del allowed['Owner']
     return list(allowed.keys())
+
+def allowedRolesAndUsers(self):
+    """
+    Return a list of roles, users and groups with View permission.
+    Used by PortalCatalog to filter out items you're not allowed to see.
+    """
+    ob = self._IndexableObjectWrapper__ob # Eeek, manual name mangling
+    return _allowedRolesAndUsers(ob)
 IndexableObjectWrapper.allowedRolesAndUsers = allowedRolesAndUsers
 
 
-def _listAllowedRolesAndUsers(self, user):
+# belongs to API too
+def _getAllowedRolesAndUsers(user):
     result = list(user.getRoles())
     result.append('Anonymous')
     result.append('user:%s' % user.getUserName())
@@ -95,6 +104,9 @@ def _listAllowedRolesAndUsers(self, user):
             result.append('group:%s' % group)
     # end groups
     return result
+
+def _listAllowedRolesAndUsers(self, user):
+    return _getAllowedRolesAndUsers(user)
 CatalogTool._listAllowedRolesAndUsers = _listAllowedRolesAndUsers
 
 
