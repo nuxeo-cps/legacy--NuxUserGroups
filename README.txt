@@ -8,6 +8,10 @@ used at the local roles level, where you can define an additionnal
 mapping of groups -> roles, thus giving the users who belong to these
 groups additionnal local roles.
 
+Two special groups, 'role:Anonymous' and 'role:Authenticated', are
+always available in local roles and represent respectively all the users
+(including anonymous), and the succesfully authenticated ones.
+
 Use for workgroups
 
   There are several ways to do workgroups with Zope, and NuxUserGroups
