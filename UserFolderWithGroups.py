@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
-# 
+#
 # $Id$
 
 """
@@ -227,7 +227,7 @@ class BasicGroupFolderMixin:
         oldgroups = user.getGroups()
         # uniquify
         dict = {}
-        for u in groupnames: 
+        for u in groupnames:
             dict[u] = None
         groupnames = dict.keys()
         # update info in user
@@ -267,7 +267,7 @@ class BasicGroupFolderMixin:
         """Remove one user from the groups"""
         # uniquify
         dict = {}
-        for u in groupnames: 
+        for u in groupnames:
             dict[u] = None
         groupnames = dict.keys()
         # check values
@@ -291,7 +291,7 @@ class BasicGroupFolderMixin:
         """Set the users of the group"""
         # uniquify
         dict = {}
-        for u in usernames: 
+        for u in usernames:
             dict[u] = None
         usernames = dict.keys()
         #
@@ -406,7 +406,7 @@ class BasicGroupFolderMixin:
     security.declarePrivate('_addGroup')
     def _addGroup(self, groupname, usernames=[], title='', REQUEST=None,
                   **kw):
-        usernames = filter(None, 
+        usernames = filter(None,
                            map(lambda u, s=string.strip: s(u), usernames))
         if not groupname:
             return MessageDialog(
@@ -434,7 +434,7 @@ class BasicGroupFolderMixin:
     security.declarePrivate('_editGroup')
     def _editGroup(self, groupname, usernames=[], title='', REQUEST=None,
                    **kw):
-        usernames = filter(None, 
+        usernames = filter(None,
                            map(lambda u, s=string.strip: s(u), usernames))
         if not groupname:
             return MessageDialog(
@@ -559,7 +559,7 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
     security.declarePrivate('_doChangeUser')
     def _doChangeUser(self, name, password, roles, domains, groups=None, **kw):
-        apply(UserFolder._doChangeUser, 
+        apply(UserFolder._doChangeUser,
               (self, name, password, roles, domains), kw)
         if groups is not None:
             self.setGroupsOfUser(groups, name)
@@ -615,7 +615,7 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
     security.declarePrivate('_addUser')
     def _addUser(self, name, password, confirm, roles, domains, REQUEST=None,
                  groups=None):
-        if not roles: 
+        if not roles:
             roles = []
         if not domains:
             domains = []
@@ -642,7 +642,7 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
                     REQUEST=None, groups=None):
         if password == 'password' and confirm == 'pconfirm':
             password = confirm = None
-        if not roles: 
+        if not roles:
             roles = []
         if not domains:
             domains = []
@@ -662,22 +662,13 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
             return self._mainUser(self, REQUEST)
 
 
-    def mergedLocalRoles(self, object, withgroups=0, withpath=0):
-        """Return a merging of object and its ancestors' __ac_local_roles__.
-
+    def mergedLocalRoles(self, object, withgroups=0):
+        """
+        Return a merging of object and its ancestors' __ac_local_roles__.
         When called with withgroups=1, the keys are
         of the form user:foo and group:bar.
-        When called with withpath=1, the path corresponding
-        to the object where the role takes place is added
-        with the role in the result. In this case of the form :
-        {'user:foo': [{'url':url, 'roles':[Role0, Role1]},
-                    {'url':url, 'roles':[Role1]}],..}.
         """
-        # Modified from AccessControl.User.getRolesInContext().
-        withpath = withpath and _cmf_support
-        
-        if withpath:
-            utool = getToolByName(object, 'portal_url')
+
         merged = {}
         object = getattr(object, 'aq_inner', object)
 
@@ -686,41 +677,25 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
                 dict = object.__ac_local_roles__ or {}
                 if callable(dict):
                     dict = dict()
-                if withpath:
-                    obj_url = utool.getRelativeUrl(object)
                 for k, v in dict.items():
                     if withgroups:
                         k = 'user:'+k # groups
                     if merged.has_key(k):
-                        if withpath:
-                            merged[k].append({'url':obj_url,'roles':v})
-                        else:
-                            merged[k] = merged[k] + v
+                        merged[k] = merged[k] + v
                     else:
-                        if withpath:
-                            merged[k] = [{'url':obj_url,'roles':v}]
-                        else:
-                            merged[k] = v
+                        merged[k] = v
             # deal with groups
             if withgroups:
                 if hasattr(object, '__ac_local_group_roles__'):
                     dict = object.__ac_local_group_roles__ or {}
                     if callable(dict):
                         dict = dict()
-                    if withpath:
-                        obj_url = utool.getRelativeUrl(object)
                     for k, v in dict.items():
                         k = 'group:'+k
                         if merged.has_key(k):
-                            if withpath:
-                                merged[k].append({'url':obj_url,'roles':v})
-                            else:
-                                merged[k] = merged[k] + v
+                            merged[k] = merged[k] + v
                         else:
-                            if withpath:
-                                merged[k] = [{'url':obj_url,'roles':v}]
-                            else:
-                                merged[k] = v
+                            merged[k] = v
             # end groups
             if hasattr(object, 'aq_parent'):
                 object = object.aq_parent
@@ -733,6 +708,67 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
             break
 
         return merged
+
+    def mergedLocalRolesWithPath(self, object, withgroups=0):
+        """
+        Return a merging of object and its ancestors' __ac_local_roles__.
+        When called with withgroups=1, the keys are
+        of the form user:foo and group:bar.
+        The path corresponding
+        to the object where the role takes place is added
+        with the role in the result. In this case of the form :
+        {'user:foo': [{'url':url, 'roles':[Role0, Role1]},
+                    {'url':url, 'roles':[Role1]}],..}.
+        """
+
+        # Modified from AccessControl.User.getRolesInContext().
+
+        if _cmf_support:
+            utool = getToolByName(object, 'portal_url')
+            merged = {}
+            object = getattr(object, 'aq_inner', object)
+
+            while 1:
+                if hasattr(object, '__ac_local_roles__'):
+                    dict = object.__ac_local_roles__ or {}
+                    if callable(dict):
+                        dict = dict()
+                    obj_url = utool.getRelativeUrl(object)
+                    for k, v in dict.items():
+                        if withgroups:
+                            k = 'user:'+k # groups
+                        if merged.has_key(k):
+                            merged[k].append({'url':obj_url,'roles':v})
+                        else:
+                            merged[k] = [{'url':obj_url,'roles':v}]
+                # deal with groups
+                if withgroups:
+                    if hasattr(object, '__ac_local_group_roles__'):
+                        dict = object.__ac_local_group_roles__ or {}
+                        if callable(dict):
+                            dict = dict()
+                        obj_url = utool.getRelativeUrl(object)
+                        for k, v in dict.items():
+                            k = 'group:'+k
+                            if merged.has_key(k):
+                                merged[k].append({'url':obj_url,'roles':v})
+                            else:
+                                merged[k] = [{'url':obj_url,'roles':v}]
+                # end groups
+                if hasattr(object, 'aq_parent'):
+                    object = object.aq_parent
+                    object = getattr(object, 'aq_inner', object)
+                    continue
+                if hasattr(object, 'im_self'):
+                    object = object.im_self
+                    object = getattr(object, 'aq_inner', object)
+                    continue
+                break
+
+            return merged
+        else:
+            # No CMF support: now way to take advantages of this feature
+            return []
 
     def _allowedRolesAndUsers(self, ob):
         """
@@ -762,4 +798,3 @@ def addUserFolderWithGroups(dispatcher, id=None, REQUEST=None):
     container.__allow_groups__ = f
     if REQUEST is not None:
         dispatcher.manage_main(dispatcher, REQUEST)
-
