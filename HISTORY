@@ -1,4 +1,23 @@
 *******************************************
+** NuxUserGroups V0.9.1 [R1 build 2003-09/22-16:07 by anguenot]
+
+ZODB Requires:
+~~~~~~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- The group support API has been generalized to accomodate multiple group
+  support implementations. mergedLocalRoles() should now be imported from
+  Products.CMFCore.utils and _getAllowedRolesAndUsers() and
+  _allowedRolesAndUsers() should now be imported from Products.CPSCore.utils.
+
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- sf code cleaning
+*******************************************
 ** NuxUserGroups V0.9.0 [R1 build 2003-08/04-15:19 by ben]
 
 ZODB Requires:
