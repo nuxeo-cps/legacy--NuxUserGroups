@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-15 -*-
 # Copyright (c) 2002 Nuxeo SARL <http://nuxeo.com>
 # Copyright (c) 2002 Florent Guillaume <mailto:fg@nuxeo.com>
 # Copyright (c) 2002 Préfecture du Bas-Rhin, France
