@@ -1,6 +1,6 @@
-# Copyright (c) 2002 Préfecture du Bas-Rhin, France
 # Copyright (c) 2002 Nuxeo SARL <http://nuxeo.com>
 # Copyright (c) 2002 Florent Guillaume <mailto:fg@nuxeo.com>
+# Copyright (c) 2002 Préfecture du Bas-Rhin, France
 # See license info at the end of this file.
 # $Id$
 
