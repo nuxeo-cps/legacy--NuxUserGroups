@@ -4,4 +4,9 @@
 
 0.6
 
-  Initial release.
+  First public release.
+  Groups are now a in separate class.
+
+0.5
+
+  First working version.
