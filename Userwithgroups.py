@@ -181,14 +181,18 @@ class UserwithgroupsFolder(UserFolder):
 
     security = ClassSecurityInfo()
 
+    # override
     def __init__(self):
         UserFolder.__init__(self)
-        # We use two mappings for speed
+        # We use two mappings for speed.
         # These mappings contain lists, which of course
         # mustn't be changed in place...
+        # Moreover, the User object has a usergroups attribute
+        # that mirrors groupsofuser, for speed too.
         self.groupsofuser = PersistentMapping() # user -> groups
         self.usersofgroup = PersistentMapping() # group -> users
 
+    # override
     security.declarePrivate('_doAddUser')
     def _doAddUser(self, name, password, roles, domains, groups=(), **kw):
         """Creates a new user"""
@@ -197,6 +201,7 @@ class UserwithgroupsFolder(UserFolder):
         self.data[name] = Userwithgroups(name,password,roles,domains)
         self.setGroupsOfUser(name, groups)
 
+    # override
     security.declarePrivate('_doDelUsers')
     def _doDelUsers(self, names):
         """Deletes one or more users."""
@@ -206,6 +211,7 @@ class UserwithgroupsFolder(UserFolder):
             if self.groupsofuser.has_key(name): del self.groupsofuser[name]
         return UserFolder._doDelUsers(self, names)
 
+    # override
     security.declarePrivate('_doChangeUser')
     def _doChangeUser(self, name, password, roles, domains, groups=(), **kw):
         self.setGroupsOfUser(name, groups)
