@@ -8,6 +8,7 @@
 from UserFolderWithGroups import UserFolderWithGroups, addUserFolderWithGroups
 import BasicUserWithGroups
 import LocalRolesWithGroups
+import CatalogToolWithGroups
 
 #createZClassForBase(GroupFolder, globals(),
 #                    'ZGroupFolder', 'Group Folder')
