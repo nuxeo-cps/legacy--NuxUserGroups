@@ -36,7 +36,7 @@ except ImportError:
     pass
 
 try:
-    from NuxCPS3.utils import _allowedRolesAndUsers, _getAllowedRolesAndUsers
+    from NuxCPS3.cpsutils import _allowedRolesAndUsers, _getAllowedRolesAndUsers
     from CMFCore.utils import mergedLocalRoles
     _cmf_localroles_patch = 1
 except ImportError:
