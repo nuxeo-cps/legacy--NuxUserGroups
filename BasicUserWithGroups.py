@@ -1,5 +1,5 @@
 # Copyright (c) 2002 Nuxeo SARL <http://nuxeo.com>
-# Copyright (c) 2002 Préfecture du Bas-Rhin, France
+# Copyright (c) 2002 Prefecture du Bas-Rhin, France
 # Author: Florent Guillaume <mailto:fg@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify

@@ -6,7 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Fixed python warning about missing charset declaration in source.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
