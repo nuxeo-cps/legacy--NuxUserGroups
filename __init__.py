@@ -10,7 +10,7 @@ from UserFolderWithGroups import UserFolderWithGroups, addUserFolderWithGroups
 import BasicUserWithGroups
 import LocalRolesWithGroups
 try:
-    import CatalogToolWithGroups
+    #import CatalogToolWithGroups
     import MembershipToolWithGroups
 except ImportError:
     pass
