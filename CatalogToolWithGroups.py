@@ -162,5 +162,8 @@ try:
     import Products.CPSCore
     # This is a CPS 3 installation, necessary patching is done in CPSCore.utils
 except ImportError:
+    try:
+        import Products.NuxCPS3
+    else ImportError:
+        cmfpatch()
     # Not a CPS3 Installation, continue on with patching
-    cmfpatch()
