@@ -786,6 +786,11 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
             del allowed['Owner']
         return list(allowed.keys())
 
+    security.declarePublic('hasLocalRolesBlocking')
+    def hasLocalRolesBlocking(self):
+        """Test if local roles blocking is implemented in this user folder."""
+        return 1
+
 InitializeClass(UserFolderWithGroups)
 
 
