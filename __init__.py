@@ -11,6 +11,7 @@ import BasicUserWithGroups
 import LocalRolesWithGroups
 try:
     import CatalogToolWithGroups
+    import MembershipToolWithGroups
 except ImportError:
     pass
 

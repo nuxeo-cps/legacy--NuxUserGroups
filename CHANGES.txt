@@ -1,5 +1,8 @@
 0.8
 
+  Added a patch to MembershipTool to provide the two safe methods
+  setLocalGroupRoles and deleteLocalGroupRoles.
+
   Added the pseudo groups "role:Anonymous" to which everybody belongs,
   and "role:Authenticated" to which logged-in users belong. This makes
   it easy to use only local roles instead of changing the
