@@ -1,6 +1,7 @@
-# Copyright (c) 2002 Nuxeo SARL <http://nuxeo.com>
-# Copyright (c) 2002 Florent Guillaume <mailto:fg@nuxeo.com>
-# See licence info at the end of this file.
+# (c) 2002 Préfecture du Bas-Rhin, France
+# (c) 2002 Nuxeo SARL <http://nuxeo.com>
+# (c) 2002 Florent Guillaume <mailto:fg@nuxeo.com>
+# See license info at the end of this file.
 # $Id$
 
 """
