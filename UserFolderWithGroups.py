@@ -38,11 +38,8 @@ from ExtensionClass import Base
 from Globals import InitializeClass, DTMLFile, MessageDialog, \
      Persistent, PersistentMapping
 from Acquisition import aq_base, Implicit
-from App.Management import Navigation, Tabs
 from AccessControl import ClassSecurityInfo, Permissions
-from AccessControl.Role import RoleManager
-from AccessControl.User import User, UserFolder, _remote_user_mode, reqattr
-from OFS.SimpleItem import Item
+from AccessControl.User import UserFolder, _remote_user_mode, reqattr
 
 try:
     from AccessControl.User import DEFAULTMAXLISTUSERS
@@ -179,8 +176,6 @@ class SpecialGroup(BasicGroup):
 InitializeClass(SpecialGroup)
 
 
-## class BasicGroupFolder(Implicit, Persistent, Navigation, Tabs,
-##                        RoleManager, Item):
 class BasicGroupFolderMixin:
     """
     Base class for GroupFolder-like objects.
@@ -194,22 +189,22 @@ class BasicGroupFolderMixin:
 
     security.declareProtected(ManageUsers, 'userFolderAddGroup')
     def userFolderAddGroup(self, groupname, **kw):
-        """Creates a group"""
+        """Create a group"""
         raise NotImplementedError
 
     security.declareProtected(ManageUsers, 'userFolderDelGroups')
     def userFolderDelGroups(self, groupnames):
-        """Deletes groups"""
+        """Delete groups"""
         raise NotImplementedError
 
     security.declareProtected(ManageUsers, 'getGroupNames')
     def getGroupNames(self):
-        """Returns a list of group names"""
+        """Return a list of group names"""
         raise NotImplementedError
 
     security.declareProtected(ManageUsers, 'getGroupById')
     def getGroupById(self, groupname):
-        """Returns the given group"""
+        """Return the given group"""
         raise NotImplementedError
 
     #
@@ -221,7 +216,7 @@ class BasicGroupFolderMixin:
 
     security.declareProtected(ManageUsers, 'setGroupsOfUser')
     def setGroupsOfUser(self, groupnames, username):
-        """Sets the groups of a user"""
+        """Set the groups of a user"""
         user = self.getUserById(username)
         oldgroups = user.getGroups()
         # uniquify
@@ -243,7 +238,7 @@ class BasicGroupFolderMixin:
 
     security.declareProtected(ManageUsers, 'addGroupsToUser')
     def addGroupsToUser(self, groupnames, username):
-        """Adds one user to the groups"""
+        """Add one user to the groups"""
         # uniquify
         dict = {}
         for u in groupnames: dict[u] = None
@@ -263,7 +258,7 @@ class BasicGroupFolderMixin:
 
     security.declareProtected(ManageUsers, 'delGroupsFromUser')
     def delGroupsFromUser(self, groupnames, username):
-        """Removes one user from the groups"""
+        """Remove one user from the groups"""
         # uniquify
         dict = {}
         for u in groupnames: 
@@ -287,7 +282,7 @@ class BasicGroupFolderMixin:
 
     security.declareProtected(ManageUsers, 'setUsersOfGroup')
     def setUsersOfGroup(self, usernames, groupname):
-        """Sets the users of the group"""
+        """Set the users of the group"""
         # uniquify
         dict = {}
         for u in usernames: 
@@ -296,8 +291,8 @@ class BasicGroupFolderMixin:
         #
         group = self.getGroupById(groupname)
         oldusers = group.getUsers()
-        addusers = filter(lambda u,o=oldusers: u not in o, usernames)
-        delusers = filter(lambda u,n=usernames: u not in n, oldusers)
+        addusers = filter(lambda u, o=oldusers: u not in o, usernames)
+        delusers = filter(lambda u, n=usernames: u not in n, oldusers)
         # update info in group
         group._setUsers(usernames)
         # update info in users
@@ -310,7 +305,7 @@ class BasicGroupFolderMixin:
 
     security.declareProtected(ManageUsers, 'addUsersToGroup')
     def addUsersToGroup(self, usernames, groupname):
-        """Adds the users to the group"""
+        """Add the users to the group"""
         # uniquify
         dict = {}
         for u in usernames:
@@ -331,7 +326,7 @@ class BasicGroupFolderMixin:
 
     security.declareProtected(ManageUsers, 'delUsersFromGroup')
     def delUsersFromGroup(self, usernames, groupname):
-        """Removes the users from the group"""
+        """Remove the users from the group"""
         # uniquify
         dict = {}
         for u in usernames: dict[u] = None
@@ -354,7 +349,7 @@ class BasicGroupFolderMixin:
     #
     security.declareProtected(ManageUsers, 'list_local_userids')
     def list_local_userids(self):
-        """Returns the list of user names or OverflowError"""
+        """Return the list of user names or OverflowError"""
         mlu = getattr(aq_base(self), 'maxlistusers', None)
         if mlu is None:
             mlu = DEFAULTMAXLISTUSERS
@@ -369,7 +364,7 @@ class BasicGroupFolderMixin:
     # ZMI
     #
     manage_options = (
-        ({'label':'User Groups', 'action':'manage_userGroups',},)
+        ({'label': 'User Groups', 'action': 'manage_userGroups',},)
     )
 
     manage_userGroups = DTMLFile('zmi/mainGroup', globals(),
@@ -500,7 +495,7 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
     security.declareProtected(ManageUsers, 'userFolderAddGroup')
     def userFolderAddGroup(self, groupname, title='', **kw):
-        """Creates a group"""
+        """Create a group"""
         if self.groups.has_key(groupname):
             raise ValueError, 'Group "%s" already exists' % groupname
         if groupname.startswith('role:'):
@@ -512,7 +507,7 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
     security.declareProtected(ManageUsers, 'userFolderDelGroups')
     def userFolderDelGroups(self, groupnames):
-        """Deletes groups"""
+        """Delete groups"""
         for groupname in groupnames:
             usernames = self.getGroupById(groupname).getUsers()
             self.delUsersFromGroup(usernames, groupname)
@@ -520,12 +515,12 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
     security.declareProtected(ManageUsers, 'getGroupNames')
     def getGroupNames(self):
-        """Returns a list of group names"""
+        """Return a list of group names"""
         return tuple(self.groups.keys())
 
     security.declareProtected(ManageUsers, 'getGroupById')
     def getGroupById(self, groupname, default=_marker):
-        """Returns the given group"""
+        """Return the given group"""
         if groupname.startswith('role:'):
             return SpecialGroup(groupname, title=groupname)
         try:
@@ -541,13 +536,13 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
     security.declarePrivate('_doAddUser')
     def _doAddUser(self, name, password, roles, domains, groups=(), **kw):
-        """Creates a new user"""
+        """Create a new user"""
         apply(UserFolder._doAddUser, (self, name, password, roles, domains), kw)
         self.setGroupsOfUser(groups, name)
 
     security.declarePrivate('_doDelUsers')
     def _doDelUsers(self, names):
-        """Deletes one or more users."""
+        """Delete one or more users."""
         for username in names:
             user = self.getUser(username)
             if user is None:
@@ -558,7 +553,8 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
     security.declarePrivate('_doChangeUser')
     def _doChangeUser(self, name, password, roles, domains, groups=None, **kw):
-        apply(UserFolder._doChangeUser, (self, name, password, roles, domains), kw)
+        apply(UserFolder._doChangeUser, 
+              (self, name, password, roles, domains), kw)
         if groups is not None:
             self.setGroupsOfUser(groups, name)
 
@@ -583,10 +579,10 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
     security.declareProtected(ManageUsers, 'manage_users')
     def manage_users(self, submit=None, REQUEST=None, RESPONSE=None):
-        """This method handles operations on users for the web based forms
-           of the ZMI. Application code (code that is outside of the forms
-           that implement the UI of a user folder) are encouraged to use
-           manage_std_addUser"""
+        """Handle operations on users for the web based forms of the ZMI.
+           Application code (code that is outside of the forms that implement
+           the UI of a user folder) are encouraged to use
+           manage_std_addUser instead."""
 
         if submit == 'Add':
             name = reqattr(REQUEST, 'name')
@@ -663,7 +659,7 @@ InitializeClass(UserFolderWithGroups)
 
 
 def addUserFolderWithGroups(dispatcher, id=None, REQUEST=None):
-    """ Adds a User Folder With Groups """
+    """Add a User Folder With Groups"""
     f = UserFolderWithGroups()
     container = dispatcher.Destination()
     container._setObject('acl_users', f)
