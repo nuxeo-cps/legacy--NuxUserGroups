@@ -217,6 +217,7 @@ class TestCPSAPI(TestBase):
         _user_role2 = 'test_role_2_'
         self.uf.userFolderAddUser(_user_name2, 'pass', [], [])
         self.uf.userFolderAddRole(_user_role2)
+        self.assert_(_user_role2 in self.folder.userdefined_roles())
         self.uf.setRolesOfUser((_user_role, _user_role2), _user_name)
         self.uf.setUsersOfRole((_user_name, _user_name2), _user_role)
         roles = list(self.uf.getUser(_user_name).getRoles())
@@ -226,6 +227,8 @@ class TestCPSAPI(TestBase):
         owners.sort()
         self.assert_(owners == [_user_name, _user_name2])
         self.assert_(self.uf.getUsersOfRole(_user_role2) == [_user_name])
+        self.uf.userFolderDelRoles((_user_role2,))
+        self.assert_(_user_role2 not in self.folder.userdefined_roles())
 
 
     def testCPSGroupAPI(self):
