@@ -1,3 +1,11 @@
+0.8
+
+  Added the pseudo groups "role:Anonymous" to which everybody belongs,
+  and "role:Authenticated" to which logged-in users belong. This makes
+  it easy to use only local roles instead of changing the
+  role/permission map, for everything that doesn't involve blocking
+  permissions.
+
 0.7
 
   Support for CMF Catalog Tool.

@@ -80,7 +80,7 @@ RoleManager.groups_with_local_role__roles__ = PermissionRole(change_permissions)
 # used by listLocalRoles
 def get_valid_groupids(self):
     item = self
-    dict = {}
+    dict = {'role:Anonymous': None, 'role:Authenticated': None}
     while 1:
         if hasattr(aq_base(item), 'acl_users') and \
            hasattr(item.acl_users, 'getGroupNames'):

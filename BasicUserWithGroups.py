@@ -68,8 +68,12 @@ def getRolesInContext(self, object):
        including local roles assigned in context of
        the passed in object."""
     name=self.getUserName()
-    groups=self.getGroups() # groups
     roles=self.getRoles()
+    # deal with groups
+    groups = self.getGroups() + ('role:Anonymous',)
+    if 'Authenticated' in roles:
+        groups = groups + ('role:Authenticated',)
+    # end groups
     local={}
     object=getattr(object, 'aq_inner', object)
     while 1:
@@ -144,7 +148,11 @@ def allowed(self, object, object_roles=None):
     # we can incur only the overhead required to find a match.
     inner_obj = getattr(object, 'aq_inner', object)
     user_name = self.getUserName()
-    groups = self.getGroups() # groups
+    # deal with groups
+    groups = self.getGroups() + ('role:Anonymous',)
+    if 'Authenticated' in user_roles:
+        groups = groups + ('role:Authenticated',)
+    # end groups
     while 1:
         local_roles = getattr(inner_obj, '__ac_local_roles__', None)
         if local_roles:
