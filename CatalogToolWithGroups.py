@@ -31,14 +31,14 @@ def mergedLocalRoles(object, withgroups=0, withpath=0):
     When called with withpath=1, the path corresponding
     to the object where the role takes place is added
     with the role in the result. In this case of the form :
-    {'user:foo': [{'Path0':[Role0, Role1]}, {'Path1':[Role1]}],..}."""
+    {'user:foo': [{'url':url, 'roles':[Role0, Role1]}, {'url':url, 'roles':[Role1]}],..}."""
     # Modified from AccessControl.User.getRolesInContext().
 
     if withpath:
         utool = getToolByName(object, 'portal_url')    
     merged = {}
     object = getattr(object, 'aq_inner', object)
-
+    
     while 1:
         if hasattr(object, '__ac_local_roles__'):            
             dict = object.__ac_local_roles__ or {}
@@ -50,12 +50,12 @@ def mergedLocalRoles(object, withgroups=0, withpath=0):
                 if withgroups: k = 'user:'+k # groups
                 if merged.has_key(k):
                     if withpath:
-                        merged[k].append({obj_url:v})
+                        merged[k].append({'url':obj_url,'roles':v})
                     else:
                         merged[k] = merged[k] + v
                 else:
                     if withpath:
-                        merged[k] = [{obj_url:v}]
+                        merged[k] = [{'url':obj_url,'roles':v}]
                     else:
                         merged[k] = v
         # deal with groups
@@ -70,12 +70,12 @@ def mergedLocalRoles(object, withgroups=0, withpath=0):
                     k = 'group:'+k
                     if merged.has_key(k):
                         if withpath:
-                            merged[k].append({obj_url:v})
+                            merged[k].append({'url':obj_url,'roles':v})
                         else:
                             merged[k] = merged[k] + v
                     else:
                         if withpath:
-                            merged[k] = [{obj_url:v}]
+                            merged[k] = [{'url':obj_url,'roles':v}]
                         else:
                             merged[k] = v
         # end groups
@@ -90,8 +90,7 @@ def mergedLocalRoles(object, withgroups=0, withpath=0):
         break
     
     return merged
-    
-        
+
 
 
 # belongs to CPS API too
