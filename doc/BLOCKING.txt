@@ -40,34 +40,12 @@ Local roles blocking
 
     Effective roles for 'user1' are 'roleC'.
 
-  Blocking specific roles for all users
-
-    The user '', when present, specifies rules to apply first and to all
-    users.
-
-    Example::
-
-      {'': ['-roleA'],
-       'user1': ['roleC'],
-       }
-
-    Effective roles for 'user1' are 'roleB' and 'roleC'.
-
-  Blocking all previous roles for all users
-
-    Example::
-
-      {'': ['-'],
-       'user1': ['roleC'],
-       }
-
-    Effective roles for 'user1' are 'roleC'.
-
   Group local roles
 
-    The above also applies to group local roles, except that there is no
-    way to block roles for all groups (the group '' has no special
-    meaning).
+    The above also applies to group local roles.
+
+    Local roles for the group 'role:Anonymous' can be used to apply
+    rules to all users.
 
   Resolution order
 
