@@ -512,9 +512,10 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
         UserFolder._doDelUsers(self, names)
 
     security.declarePrivate('_doChangeUser')
-    def _doChangeUser(self, name, password, roles, domains, groups=(), **kw):
+    def _doChangeUser(self, name, password, roles, domains, groups=None, **kw):
         apply(UserFolder._doChangeUser, (self, name, password, roles, domains), kw)
-        self.setGroupsOfUser(groups, name)
+        if groups is not None:
+            self.setGroupsOfUser(groups, name)
 
     #
     # ZMI overrides
@@ -592,7 +593,6 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
             password = confirm = None
         if not roles: roles=[]
         if not domains: domains=[]
-        if not groups: groups=[]
         # error cases
         if ((not name) or
             (password == confirm == '') or
