@@ -123,7 +123,7 @@ def allowed(self, object, object_roles=None):
     """Check whether the user has access to object. The user must
        have one of the roles in object_roles to allow access."""
 
-    if object_roles is _what_not_even_god_should_do: 
+    if object_roles is _what_not_even_god_should_do:
         return 0
 
     # Short-circuit the common case of anonymous access.
@@ -203,4 +203,3 @@ def allowed(self, object, object_roles=None):
         break
     return None
 BasicUser.allowed = allowed
-
