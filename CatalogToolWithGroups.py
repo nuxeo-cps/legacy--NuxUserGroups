@@ -11,46 +11,73 @@
 
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, INFO
+from zLOG import LOG, INFO, DEBUG
 
 from AccessControl.PermissionRole import rolesForPermissionOn
 
 from Products.CMFCore.CatalogTool import IndexableObjectWrapper, \
      CatalogTool
 
+from Products.CMFCore.utils import getToolByName
 
 LOG('NuxUserGroups.CatalogToolWithGroups', INFO, 'Patching CatalogTool')
 
 
-def mergedLocalRoles(object, withgroups=0):
+def mergedLocalRoles(object, withgroups=0, withpath=0):
     """Returns a merging of object and its ancestors'
     __ac_local_roles__.
     When called with withgroups=1, the keys are
-    of the form user:foo and group:bar."""
+    of the form user:foo and group:bar.
+    When called with withpath=1, the path corresponding
+    to the object where the role takes place is added
+    with the role in the result. In this case of the form :
+    {'user:foo': [{'Path0':[Role0, Role1]}, {'Path1':[Role1]}],..}."""
     # Modified from AccessControl.User.getRolesInContext().
+
+    if withpath:
+        utool = getToolByName(object, 'portal_url')    
     merged = {}
     object = getattr(object, 'aq_inner', object)
+
     while 1:
-        if hasattr(object, '__ac_local_roles__'):
+        if hasattr(object, '__ac_local_roles__'):            
             dict = object.__ac_local_roles__ or {}
-            if callable(dict): dict = dict()
+            if callable(dict):
+                dict = dict()
+            if withpath:
+                obj_url = utool.getRelativeUrl(object)
             for k, v in dict.items():
                 if withgroups: k = 'user:'+k # groups
                 if merged.has_key(k):
-                    merged[k] = merged[k] + v
+                    if withpath:
+                        merged[k].append({obj_url:v})
+                    else:
+                        merged[k] = merged[k] + v
                 else:
-                    merged[k] = v
+                    if withpath:
+                        merged[k] = [{obj_url:v}]
+                    else:
+                        merged[k] = v
         # deal with groups
-        if withgroups:
+        if withgroups:            
             if hasattr(object, '__ac_local_group_roles__'):
                 dict = object.__ac_local_group_roles__ or {}
-                if callable(dict): dict = dict()
+                if callable(dict):
+                    dict = dict()
+                if withpath:
+                    obj_url = utool.getRelativeUrl(object)
                 for k, v in dict.items():
                     k = 'group:'+k
                     if merged.has_key(k):
-                        merged[k] = merged[k] + v
+                        if withpath:
+                            merged[k].append({obj_url:v})
+                        else:
+                            merged[k] = merged[k] + v
                     else:
-                        merged[k] = v
+                        if withpath:
+                            merged[k] = [{obj_url:v}]
+                        else:
+                            merged[k] = v
         # end groups
         if hasattr(object, 'aq_parent'):
             object=object.aq_parent
@@ -61,7 +88,10 @@ def mergedLocalRoles(object, withgroups=0):
             object=getattr(object, 'aq_inner', object)
             continue
         break
+    
     return merged
+    
+        
 
 
 # belongs to CPS API too
