@@ -19,6 +19,7 @@ __version__ = '$Revision$'[11:-2]
 
 import string, re, urllib, os
 
+from ExtensionClass import Base
 from Globals import InitializeClass, DTMLFile, MessageDialog, \
      Persistent, PersistentMapping
 from Acquisition import aq_base, Implicit
@@ -37,7 +38,7 @@ except:
 ManageUsers = Permissions.manage_users
 _marker = []
 
-class BasicGroup(Implicit, Persistent):
+class BasicGroup(Base):
     """
     Base class for Group object
     """
@@ -56,25 +57,25 @@ class BasicGroup(Implicit, Persistent):
     security.declareProtected(ManageUsers, 'getUsers')
     def getUsers(self):
         """Group users"""
-        return NotImplemented
+        raise NotImplementedError
 
     security.declarePrivate('_setUsers')
     def _setUsers(self, usernames):
         # this method is not responsible for keeping in sync
         # with the User objects or the GroupFolder
-        return NotImplemented
+        raise NotImplementedError
 
     security.declarePrivate('_addUsers')
     def _addUsers(self, usernames):
         # this method is not responsible for keeping in sync
         # with the User objects or the GroupFolder
-        return NotImplemented
+        raise NotImplementedError
 
     security.declarePrivate('_delUsers')
     def _delUsers(self, usernames):
         # this method is not responsible for keeping in sync
         # with the User objects or the GroupFolder
-        return NotImplemented
+        raise NotImplementedError
 
     #
     # Basic API
@@ -97,11 +98,10 @@ class BasicGroup(Implicit, Persistent):
         if usernames is not None:
             self.setUsers(usernames)
 
-
 InitializeClass(BasicGroup)
 
 
-class Group(BasicGroup):
+class Group(Implicit, Persistent, BasicGroup):
     """
     Standard Group object
     """
@@ -134,9 +134,34 @@ class Group(BasicGroup):
             users.remove(username)
         self.users = users
 
-
 InitializeClass(Group)
 
+
+class SpecialGroup(BasicGroup):
+    """A dynamic group that has no explicit members.
+    Not persistent.
+    """
+
+    security = ClassSecurityInfo()
+
+    security.declareProtected(ManageUsers, 'getUsers')
+    def getUsers(self):
+        """Group users"""
+        return ()
+
+    security.declarePrivate('_setUsers')
+    def _setUsers(self, usernames):
+        raise NotImplementedError
+
+    security.declarePrivate('_addUsers')
+    def _addUsers(self, usernames):
+        raise NotImplementedError
+
+    security.declarePrivate('_delUsers')
+    def _delUsers(self, usernames):
+        raise NotImplementedError
+
+InitializeClass(SpecialGroup)
 
 
 ## class BasicGroupFolder(Implicit, Persistent, Navigation, Tabs,
@@ -155,22 +180,22 @@ class BasicGroupFolderMixin:
     security.declareProtected(ManageUsers, 'userFolderAddGroup')
     def userFolderAddGroup(self, groupname, **kw):
         """Creates a group"""
-        raise NotImplemented
+        raise NotImplementedError
 
     security.declareProtected(ManageUsers, 'userFolderDelGroups')
     def userFolderDelGroups(self, groupnames):
         """Deletes groups"""
-        raise NotImplemented
+        raise NotImplementedError
 
     security.declareProtected(ManageUsers, 'getGroupNames')
     def getGroupNames(self):
         """Returns a list of group names"""
-        raise NotImplemented
+        raise NotImplementedError
 
     security.declareProtected(ManageUsers, 'getGroupById')
     def getGroupById(self, groupname):
         """Returns the given group"""
-        raise NotImplemented
+        raise NotImplementedError
 
     #
     # Basic API
@@ -431,7 +456,6 @@ class BasicGroupFolderMixin:
         if REQUEST is not None:
             return self.manage_userGroups(self, REQUEST)
 
-
 InitializeClass(BasicGroupFolderMixin)
 
 
@@ -463,6 +487,8 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
         """Creates a group"""
         if self.groups.has_key(groupname):
             raise ValueError, 'Group "%s" already exists' % groupname
+        if groupname.startswith('role:'):
+            raise ValueError, 'Group "%s" is reserved' % groupname
         a = 'before: groupname %s groups %s' % (groupname, self.groups)
         group = apply(Group, (groupname,), kw)
         group.setTitle(title)
@@ -484,6 +510,8 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
     security.declareProtected(ManageUsers, 'getGroupById')
     def getGroupById(self, groupname, default=_marker):
         """Returns the given group"""
+        if groupname.startswith('role:'):
+            return SpecialGroup(groupname, title=groupname)
         try:
             group = self.groups[groupname]
         except KeyError:
@@ -608,10 +636,6 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
         if REQUEST is not None:
             return self._mainUser(self, REQUEST)
-
-
-
-
 
 InitializeClass(UserFolderWithGroups)
 
