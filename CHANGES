@@ -9,4 +9,4 @@ Bug fixes:
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- Refactoring : split of mergedLocalRoles in 2 methods : mergedLocalRoles and mergedLocalRolesWithPath (used within CPS3)
