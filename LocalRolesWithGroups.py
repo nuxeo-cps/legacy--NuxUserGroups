@@ -30,16 +30,16 @@ RoleManager.__ac_local_group_roles__ = __ac_local_group_roles__
 
 
 # override
-manage_listLocalRoles=DTMLFile('zmi/listLocalRoles', globals(),
-                               management_view='Security',
-                               help_topic='Security_Local-Roles.stx',
-                               help_product='OFSP')
+manage_listLocalRoles = DTMLFile('zmi/listLocalRoles', globals(),
+                                 management_view='Security',
+                                 help_topic='Security_Local-Roles.stx',
+                                 help_product='OFSP')
 RoleManager.manage_listLocalRoles = manage_listLocalRoles
 
 
 # new management page
-manage_editLocalGroupRoles=DTMLFile('zmi/editLocalGroupRoles', globals(),
-                                    management_view='Security')
+manage_editLocalGroupRoles = DTMLFile('zmi/editLocalGroupRoles', globals(),
+                                      management_view='Security')
 RoleManager.manage_editLocalGroupRoles = manage_editLocalGroupRoles
 RoleManager.manage_editLocalGroupRoles__roles__ = PermissionRole(change_permissions)
 
@@ -101,7 +101,7 @@ RoleManager.get_valid_groupids__roles__ = PermissionRole(change_permissions)
 
 # used by editLocalGroupRoles
 def get_local_roles_for_groupid(self, groupid):
-    dict=self.__ac_local_group_roles__ or {}
+    dict = self.__ac_local_group_roles__ or {}
     return tuple(dict.get(groupid, []))
 
 RoleManager.get_local_roles_for_groupid = get_local_roles_for_groupid
@@ -135,7 +135,7 @@ def manage_setLocalGroupRoles(self, groupid, roles=[], REQUEST=None):
     dict[groupid] = roles
     self.__ac_local_group_roles__ = dict
     if REQUEST is not None:
-        stat='Your changes have been saved.'
+        stat = 'Your changes have been saved.'
         return self.manage_listLocalRoles(self, REQUEST, stat=stat)
 
 RoleManager.manage_setLocalGroupRoles = manage_setLocalGroupRoles
@@ -150,7 +150,7 @@ def manage_delLocalGroupRoles(self, groupids, REQUEST=None):
             del dict[groupid]
     self.__ac_local_group_roles__ = dict
     if REQUEST is not None:
-        stat='Your changes have been saved.'
+        stat = 'Your changes have been saved.'
         return self.manage_listLocalRoles(self, REQUEST, stat=stat)
 
 RoleManager.manage_delLocalGroupRoles = manage_delLocalGroupRoles

@@ -23,8 +23,7 @@ def initialize(registrar):
         UserFolderWithGroups,
         permission='Add User Folders',
         constructors=(addUserFolderWithGroups,),
-        icon='UserFolder_icon.gif',
-        )
+        icon='UserFolder_icon.gif')
 
 
 # This program is free software; you can redistribute it and/or modify

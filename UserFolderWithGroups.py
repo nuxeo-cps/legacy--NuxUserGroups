@@ -1,11 +1,26 @@
 # Copyright (c) 2002 Nuxeo SARL <http://nuxeo.com>
 # Copyright (c) 2002 Florent Guillaume <mailto:fg@nuxeo.com>
 # Copyright (c) 2002 Préfecture du Bas-Rhin, France
-# See license info at the end of this file.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+# 
 # $Id$
 
 """
   UserFolderWithGroups
+
   A User Folder with groups support.
 """
 
@@ -24,7 +39,7 @@ from Globals import InitializeClass, DTMLFile, MessageDialog, \
      Persistent, PersistentMapping
 from Acquisition import aq_base, Implicit
 from App.Management import Navigation, Tabs
-from AccessControl import ClassSecurityInfo, getSecurityManager, Permissions
+from AccessControl import ClassSecurityInfo, Permissions
 from AccessControl.Role import RoleManager
 from AccessControl.User import User, UserFolder, _remote_user_mode, reqattr
 from OFS.SimpleItem import Item
@@ -92,7 +107,7 @@ class BasicGroup(Base):
 
     security.declareProtected(ManageUsers, 'edit')
     def edit(self, title=None, usernames=None, **kw):
-        """edit the group"""
+        """Edit the group"""
         if title is not None:
             self.setTitle(title)
         if usernames is not None:
@@ -211,13 +226,14 @@ class BasicGroupFolderMixin:
         oldgroups = user.getGroups()
         # uniquify
         dict = {}
-        for u in groupnames: dict[u] = None
+        for u in groupnames: 
+            dict[u] = None
         groupnames = dict.keys()
         # update info in user
         user._setGroups(groupnames)
         # update info in groups
-        addgroups = filter(lambda g,o=oldgroups: g not in o, groupnames)
-        delgroups = filter(lambda g,n=groupnames: g not in n, oldgroups)
+        addgroups = filter(lambda g, o=oldgroups: g not in o, groupnames)
+        delgroups = filter(lambda g, n=groupnames: g not in n, oldgroups)
         for groupname in addgroups:
             group = self.getGroupById(groupname)
             group._addUsers((username,))
@@ -250,7 +266,8 @@ class BasicGroupFolderMixin:
         """Removes one user from the groups"""
         # uniquify
         dict = {}
-        for u in groupnames: dict[u] = None
+        for u in groupnames: 
+            dict[u] = None
         groupnames = dict.keys()
         # check values
         user = self.getUserById(username)
@@ -273,7 +290,8 @@ class BasicGroupFolderMixin:
         """Sets the users of the group"""
         # uniquify
         dict = {}
-        for u in usernames: dict[u] = None
+        for u in usernames: 
+            dict[u] = None
         usernames = dict.keys()
         #
         group = self.getGroupById(groupname)
@@ -295,7 +313,8 @@ class BasicGroupFolderMixin:
         """Adds the users to the group"""
         # uniquify
         dict = {}
-        for u in usernames: dict[u] = None
+        for u in usernames:
+            dict[u] = None
         usernames = dict.keys()
         # check values
         group = self.getGroupById(groupname)
@@ -333,7 +352,6 @@ class BasicGroupFolderMixin:
     #
     # Helper function
     #
-
     security.declareProtected(ManageUsers, 'list_local_userids')
     def list_local_userids(self):
         """Returns the list of user names or OverflowError"""
@@ -350,12 +368,9 @@ class BasicGroupFolderMixin:
     #
     # ZMI
     #
-
     manage_options = (
-        (
-        {'label':'User Groups', 'action':'manage_userGroups',},
-        )
-        )
+        ({'label':'User Groups', 'action':'manage_userGroups',},)
+    )
 
     manage_userGroups = DTMLFile('zmi/mainGroup', globals(),
                                  management_view='User Groups')
@@ -390,17 +405,18 @@ class BasicGroupFolderMixin:
     security.declarePrivate('_addGroup')
     def _addGroup(self, groupname, usernames=[], title='', REQUEST=None,
                   **kw):
-        usernames = filter(None, map(lambda u,s=string.strip:s(u), usernames))
+        usernames = filter(None, 
+                           map(lambda u, s=string.strip: s(u), usernames))
         if not groupname:
             return MessageDialog(
-                title  ='Illegal value',
+                title='Illegal value',
                 message='A group name must be specified',
-                action ='manage_userGroups')
+                action='manage_userGroups')
         if self.getGroupById(groupname, None) is not None:
             return MessageDialog(
-                title  ='Illegal value',
+                title='Illegal value',
                 message='A group named "%s" already exists' % groupname,
-                action ='manage_userGroups')
+                action='manage_userGroups')
         for username in usernames:
             if not self.getUserById(username):
                 return MessageDialog(
@@ -417,12 +433,13 @@ class BasicGroupFolderMixin:
     security.declarePrivate('_editGroup')
     def _editGroup(self, groupname, usernames=[], title='', REQUEST=None,
                    **kw):
-        usernames = filter(None, map(lambda u,s=string.strip:s(u), usernames))
+        usernames = filter(None, 
+                           map(lambda u, s=string.strip: s(u), usernames))
         if not groupname:
             return MessageDialog(
-                title  ='Illegal value',
+                title='Illegal value',
                 message='A group name must be specified',
-                action ='manage_userGroups')
+                action='manage_userGroups')
         group = self.getGroupById(groupname, None)
         if group is None:
             return MessageDialog(
@@ -457,7 +474,6 @@ class BasicGroupFolderMixin:
             return self.manage_userGroups(self, REQUEST)
 
 InitializeClass(BasicGroupFolderMixin)
-
 
 
 class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
@@ -558,12 +574,12 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
 
     security.declarePrivate('_add_User')
-    _add_User=DTMLFile('zmi/addUser', globals(),
-                       remote_user_mode__=_remote_user_mode)
+    _add_User = DTMLFile('zmi/addUser', globals(),
+                         remote_user_mode__=_remote_user_mode)
 
     security.declarePrivate('_editUser')
     _editUser = DTMLFile('zmi/editUser', globals(),
-                         remote_user_mode__ = _remote_user_mode)
+                         remote_user_mode__=_remote_user_mode)
 
     security.declareProtected(ManageUsers, 'manage_users')
     def manage_users(self, submit=None, REQUEST=None, RESPONSE=None):
@@ -572,33 +588,37 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
            that implement the UI of a user folder) are encouraged to use
            manage_std_addUser"""
 
-        if submit=='Add':
-            name    =reqattr(REQUEST, 'name')
-            password=reqattr(REQUEST, 'password')
-            confirm =reqattr(REQUEST, 'confirm')
-            roles   =reqattr(REQUEST, 'roles')
-            domains =reqattr(REQUEST, 'domains')
-            groups  =reqattr(REQUEST, 'groupnames')
-            return self._addUser(name,password,confirm,roles,domains,REQUEST,groups)
+        if submit == 'Add':
+            name = reqattr(REQUEST, 'name')
+            password = reqattr(REQUEST, 'password')
+            confirm = reqattr(REQUEST, 'confirm')
+            roles = reqattr(REQUEST, 'roles')
+            domains = reqattr(REQUEST, 'domains')
+            groups = reqattr(REQUEST, 'groupnames')
+            return self._addUser(name, password, confirm, roles, domains,
+                                 REQUEST, groups)
 
-        if submit=='Change':
-            name    =reqattr(REQUEST, 'name')
-            password=reqattr(REQUEST, 'password')
-            confirm =reqattr(REQUEST, 'confirm')
-            roles   =reqattr(REQUEST, 'roles')
-            domains =reqattr(REQUEST, 'domains')
-            groups  =reqattr(REQUEST, 'groupnames')
-            return self._changeUser(name,password,confirm,roles,
-                                    domains,REQUEST,groups)
+        if submit == 'Change':
+            name = reqattr(REQUEST, 'name')
+            password = reqattr(REQUEST, 'password')
+            confirm = reqattr(REQUEST, 'confirm')
+            roles = reqattr(REQUEST, 'roles')
+            domains = reqattr(REQUEST, 'domains')
+            groups  = reqattr(REQUEST, 'groupnames')
+            return self._changeUser(name, password, confirm, roles, domains,
+                                    REQUEST, groups)
 
         return UserFolder.manage_users(self, submit, REQUEST, RESPONSE)
 
     security.declarePrivate('_addUser')
-    def _addUser(self,name,password,confirm,roles,domains,REQUEST=None,
+    def _addUser(self, name, password, confirm, roles, domains, REQUEST=None,
                  groups=None):
-        if not roles: roles=[]
-        if not domains: domains=[]
-        if not groups: groups=[]
+        if not roles: 
+            roles = []
+        if not domains:
+            domains = []
+        if not groups:
+            groups = []
         # error cases
         if ((not name) or
             (not password or not confirm) or
@@ -607,8 +627,8 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
             ((password or confirm) and (password != confirm)) or
             (domains and not self.domainSpecValidate(domains))
             ):
-            return UserFolder._addUser(self,name,password,confirm,roles,
-                                       domains,REQUEST)
+            return UserFolder._addUser(self, name, password, confirm, roles,
+                                       domains, REQUEST)
 
         self._doAddUser(name, password, roles, domains, groups)
 
@@ -616,12 +636,14 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
             return self._mainUser(self, REQUEST)
 
     security.declarePrivate('_changeUser')
-    def _changeUser(self,name,password,confirm,roles,domains,REQUEST=None,
-                    groups=None):
+    def _changeUser(self, name, password, confirm, roles, domains,
+                    REQUEST=None, groups=None):
         if password == 'password' and confirm == 'pconfirm':
             password = confirm = None
-        if not roles: roles=[]
-        if not domains: domains=[]
+        if not roles: 
+            roles = []
+        if not domains:
+            domains = []
         # error cases
         if ((not name) or
             (password == confirm == '') or
@@ -640,7 +662,6 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 InitializeClass(UserFolderWithGroups)
 
 
-
 def addUserFolderWithGroups(dispatcher, id=None, REQUEST=None):
     """ Adds a User Folder With Groups """
     f = UserFolderWithGroups()
@@ -650,18 +671,3 @@ def addUserFolderWithGroups(dispatcher, id=None, REQUEST=None):
     if REQUEST is not None:
         dispatcher.manage_main(dispatcher, REQUEST)
 
-
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as published
-# by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.

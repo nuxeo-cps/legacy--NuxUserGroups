@@ -1,7 +1,20 @@
-# (c) 2002 Nuxeo SARL <http://nuxeo.com>
-# (c) 2002 Florent Guillaume <mailto:fg@nuxeo.com>
-# (c) 2002 Préfecture du Bas-Rhin, France
-# See license info at the end of this file.
+# Copyright (c) 2002 Nuxeo SARL <http://nuxeo.com>
+# Copyright (c) 2002 Préfecture du Bas-Rhin, France
+# Author: Florent Guillaume <mailto:fg@nuxeo.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
 # $Id$
 
 """
@@ -14,10 +27,7 @@ __version__ = '$Revision$'[11:-2]
 
 from zLOG import LOG, INFO
 
-from Acquisition import aq_base
-from Globals import DTMLFile
-from AccessControl.User import BasicUser, BasicUserFolder, \
-     _remote_user_mode
+from AccessControl.User import BasicUser
 from AccessControl.PermissionRole import _what_not_even_god_should_do
 
 
@@ -67,32 +77,32 @@ def getRolesInContext(self, object):
     """Return the list of roles assigned to the user,
        including local roles assigned in context of
        the passed in object."""
-    name=self.getUserName()
-    roles=self.getRoles()
+    name = self.getUserName()
+    roles = self.getRoles()
     # deal with groups
     groups = self.getGroups() + ('role:Anonymous',)
     if 'Authenticated' in roles:
         groups = groups + ('role:Authenticated',)
     # end groups
-    local={}
-    object=getattr(object, 'aq_inner', object)
+    local = {}
+    object = getattr(object, 'aq_inner', object)
     while 1:
         local_roles = getattr(object, '__ac_local_roles__', None)
         if local_roles:
             if callable(local_roles):
-                local_roles=local_roles()
-            dict=local_roles or {}
+                local_roles = local_roles()
+            dict = local_roles or {}
             for r in dict.get(name, []):
-                local[r]=1
+                local[r] = 1
         # deal with groups
         local_group_roles = getattr(object, '__ac_local_group_roles__', None)
         if local_group_roles:
             if callable(local_group_roles):
-                local_group_roles=local_group_roles()
-            dict=local_group_roles or {}
+                local_group_roles = local_group_roles()
+            dict = local_group_roles or {}
             for g in groups:
                 for r in dict.get(g, []):
-                    local[r]=1
+                    local[r] = 1
         # end groups
         inner = getattr(object, 'aq_inner', object)
         parent = getattr(inner, 'aq_parent', None)
@@ -100,11 +110,11 @@ def getRolesInContext(self, object):
             object = parent
             continue
         if hasattr(object, 'im_self'):
-            object=object.im_self
-            object=getattr(object, 'aq_inner', object)
+            object = object.im_self
+            object = getattr(object, 'aq_inner', object)
             continue
         break
-    roles=list(roles) + local.keys()
+    roles = list(roles) + local.keys()
     return roles
 BasicUser.getRolesInContext = getRolesInContext
 
@@ -113,7 +123,8 @@ def allowed(self, object, object_roles=None):
     """Check whether the user has access to object. The user must
        have one of the roles in object_roles to allow access."""
 
-    if object_roles is _what_not_even_god_should_do: return 0
+    if object_roles is _what_not_even_god_should_do: 
+        return 0
 
     # Short-circuit the common case of anonymous access.
     if object_roles is None or 'Anonymous' in object_roles:
@@ -186,24 +197,10 @@ def allowed(self, object, object_roles=None):
             inner_obj = parent
             continue
         if hasattr(inner_obj, 'im_self'):
-            inner_obj=inner_obj.im_self
-            inner_obj=getattr(inner_obj, 'aq_inner', inner_obj)
+            inner_obj = inner_obj.im_self
+            inner_obj = getattr(inner_obj, 'aq_inner', inner_obj)
             continue
         break
     return None
 BasicUser.allowed = allowed
 
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as published
-# by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.

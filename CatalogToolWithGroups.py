@@ -1,7 +1,20 @@
-# (c) 2002 Nuxeo SARL <http://nuxeo.com>
-# (c) 2002 Florent Guillaume <mailto:fg@nuxeo.com>
-# (c) 2002 Préfecture du Bas-Rhin, France
-# See license info at the end of this file.
+# Copyright (c) 2002 Nuxeo SARL <http://nuxeo.com>
+# Copyright (c) 2002 Préfecture du Bas-Rhin, France
+# Author: Florent Guillaume <mailto:fg@nuxeo.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
 # $Id$
 
 """
@@ -24,14 +37,16 @@ LOG('NuxUserGroups.CatalogToolWithGroups', INFO, 'Patching CatalogTool')
 
 
 def mergedLocalRoles(object, withgroups=0, withpath=0):
-    """Returns a merging of object and its ancestors'
-    __ac_local_roles__.
+    """Return a merging of object and its ancestors' __ac_local_roles__.
+
     When called with withgroups=1, the keys are
     of the form user:foo and group:bar.
     When called with withpath=1, the path corresponding
     to the object where the role takes place is added
     with the role in the result. In this case of the form :
-    {'user:foo': [{'url':url, 'roles':[Role0, Role1]}, {'url':url, 'roles':[Role1]}],..}."""
+    {'user:foo': [{'url':url, 'roles':[Role0, Role1]}, 
+                  {'url':url, 'roles':[Role1]}],..}.
+    """
     # Modified from AccessControl.User.getRolesInContext().
 
     if withpath:
@@ -47,7 +62,8 @@ def mergedLocalRoles(object, withgroups=0, withpath=0):
             if withpath:
                 obj_url = utool.getRelativeUrl(object)
             for k, v in dict.items():
-                if withgroups: k = 'user:'+k # groups
+                if withgroups: 
+                    k = 'user:'+k # groups
                 if merged.has_key(k):
                     if withpath:
                         merged[k].append({'url':obj_url,'roles':v})
@@ -80,12 +96,12 @@ def mergedLocalRoles(object, withgroups=0, withpath=0):
                             merged[k] = v
         # end groups
         if hasattr(object, 'aq_parent'):
-            object=object.aq_parent
-            object=getattr(object, 'aq_inner', object)
+            object = object.aq_parent
+            object = getattr(object, 'aq_inner', object)
             continue
         if hasattr(object, 'im_self'):
-            object=object.im_self
-            object=getattr(object, 'aq_inner', object)
+            object = object.im_self
+            object = getattr(object, 'aq_inner', object)
             continue
         break
     
@@ -141,17 +157,3 @@ def _listAllowedRolesAndUsers(self, user):
     return _getAllowedRolesAndUsers(user)
 CatalogTool._listAllowedRolesAndUsers = _listAllowedRolesAndUsers
 
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as published
-# by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
