@@ -31,8 +31,7 @@ __version__ = '$Revision$'[11:-2]
 # say "usergroup" to prevent clashes with some existing
 # UserFolders that use "group" for "role".
 
-
-import string, re, urllib, os
+import string
 
 from ExtensionClass import Base
 from Globals import InitializeClass, DTMLFile, MessageDialog, \

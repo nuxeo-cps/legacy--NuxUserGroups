@@ -10,7 +10,6 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
 from Testing.ZopeTestCase import _user_name, ZopeLite
-from AccessControl import Unauthorized
 from testUserFolder import TestBase
 
 ZopeLite.installProduct('NuxUserGroups')
@@ -43,7 +42,6 @@ class TestUser(TestBase):
         # full property support.
         self.assertEquals(self.uf.listUserProperties(), 
             ('id', 'roles', 'groups') )
-        
 
     
 if __name__ == '__main__':

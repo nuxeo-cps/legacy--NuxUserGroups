@@ -4,19 +4,15 @@
 # See license info at the end of this file.
 # $Id$
 
-#from ZClasses import createZClassForBase
-
 from UserFolderWithGroups import UserFolderWithGroups, addUserFolderWithGroups
+
+# Import dynamic patches
 import BasicUserWithGroups
 import LocalRolesWithGroups
 try:
-    #import CatalogToolWithGroups
     import MembershipToolWithGroups
 except ImportError:
     pass
-
-#createZClassForBase(GroupFolder, globals(),
-#                    'ZGroupFolder', 'Group Folder')
 
 def initialize(registrar):
     registrar.registerClass(

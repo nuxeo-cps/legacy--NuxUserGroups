@@ -11,14 +11,11 @@
 
 __version__ = '$Revision$'[11:-2]
 
-import string, re, urllib, os
-
 from zLOG import LOG, INFO
 from Globals import DTMLFile
 from Acquisition import aq_base
 from AccessControl.Permissions import change_permissions
 from AccessControl.PermissionRole import PermissionRole
-
 from AccessControl.Role import RoleManager
 
 

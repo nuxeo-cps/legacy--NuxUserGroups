@@ -30,7 +30,6 @@ from zLOG import LOG, INFO
 from AccessControl.User import BasicUser
 from AccessControl.PermissionRole import _what_not_even_god_should_do
 
-
 LOG("NuxUserGroups.BasicUserWithGroups", INFO, "Patching BasicUser")
 
 

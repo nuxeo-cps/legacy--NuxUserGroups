@@ -10,9 +10,7 @@ if __name__ == '__main__':
 #os.environ['STUPID_LOG_SEVERITY'] = '-200'  # DEBUG
 
 from Testing.ZopeTestCase import _user_name, ZopeLite, ZopeTestCase
-from AccessControl import Unauthorized
 from Products.NuxUserGroups.UserFolderWithGroups import Group
-
 
 class TestGroup(ZopeTestCase):
     # These tests are mostly here to prove that the full API is supported.
