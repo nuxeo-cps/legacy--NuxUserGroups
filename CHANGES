@@ -1,5 +1,5 @@
-ZODB Requires:
-~~~~~~~~~~~~~~
+Requires:
+~~~~~~~~~
 -
 New features:
 ~~~~~~~~~~~~~
@@ -9,4 +9,4 @@ Bug fixes:
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- Added unit tests.
+-
