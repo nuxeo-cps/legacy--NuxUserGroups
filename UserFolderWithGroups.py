@@ -47,6 +47,11 @@ try:
 except:
     DEFAULTMAXLISTUSERS = 250
 
+try:
+    from Products.CMFCore.utils import getToolByName
+    _cmf_support = 1
+except ImportError:
+    _cmf_support = 0
 
 ManageUsers = Permissions.manage_users
 _marker = []
@@ -669,7 +674,8 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
                     {'url':url, 'roles':[Role1]}],..}.
         """
         # Modified from AccessControl.User.getRolesInContext().
-
+        withpath = withpath and _cmf_support
+        
         if withpath:
             utool = getToolByName(object, 'portal_url')
         merged = {}
