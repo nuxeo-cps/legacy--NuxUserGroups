@@ -1,0 +1,69 @@
+Local roles blocking
+
+  Version
+
+    $Id$
+
+  Standard local roles
+
+    They are stored as a dictionnary mapping user to roles::
+
+      {'user1': ['roleA', 'roleB'],
+       'user2': ...,
+       }
+
+    In the following, the above roles are supposed to be specified at a
+    higher level than the following examples.
+
+  Blocking specific roles of a user
+
+    A role prefixed by '-' means that this role should be blocked from
+    acquired roles for that user. Roles prefixed by '-' are evaluated
+    before others.
+
+    Example::
+
+      {'user1': ['-roleA', 'roleC'],
+       }
+
+    Effective roles for 'user1' are 'roleB' and 'roleC'.
+
+  Blocking all previous roles of a user
+
+    The role '-', when present, means to not acquire any roles for that
+    user.
+
+    Example::
+
+      {'user1': ['-', 'roleC'],
+       }
+
+    Effective roles for 'user1' are 'roleC'.
+
+  Blocking specific roles for all users
+
+    The user '', when present, specifies rules to apply first and to all
+    users.
+
+    Example::
+
+      {'': ['-roleA'],
+       'user1': ['roleC'],
+       }
+
+    Effective roles for 'user1' are 'roleB' and 'roleC'.
+
+  Blocking all previous roles for all users
+
+    Example::
+
+      {'': ['-'],
+       'user1': ['roleC'],
+       }
+
+    Effective roles for 'user1' are 'roleC'.
+
+  Group local roles
+
+    The above also applies to groups, except that there is no way to
+    block roles for all groups (the group '' has no special meaning).
