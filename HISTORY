@@ -1,4 +1,20 @@
 *******************************************
+** NuxUserGroups V0.10.1 [R1 build 2004/08/16-15:27 by ben]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Fixed python warning about missing charset declaration in source.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** NuxUserGroups V0.10.0 [R1 build 2004/06/14-08:06 by ben]
 
 Requires:
