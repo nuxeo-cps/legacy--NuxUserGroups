@@ -65,5 +65,34 @@ Local roles blocking
 
   Group local roles
 
-    The above also applies to groups, except that there is no way to
-    block roles for all groups (the group '' has no special meaning).
+    The above also applies to group local roles, except that there is no
+    way to block roles for all groups (the group '' has no special
+    meaning).
+
+  Resolution order
+
+    When groups are in use, an important side effect occurs. A given
+    user can see its local roles specified through several ways: the
+    user itself, and any group it belongs to.
+
+    The following rule is used to resolve local roles at a given step of
+    the acquisition tree: if a positive local role is specified for a
+    user or one of its groups, this role is effective. Then negative
+    roles (prefixed by '-') are evaluated, and may then block any higher
+    acquisition of a role.
+
+    Example, with 'user1' belonging to 'group1' and 'group2'::
+
+      In a folder:
+
+        {'user1': ['roleB'],
+         }
+
+      In a subfolder of the folder:
+
+        {'group1': ['-roleA', '-roleB'],
+         'group2': ['roleA'],
+         }
+
+    Effective roles for 'user1' in the folder are 'roleB'.
+    Effective roles for 'user1' in the subfolder are 'roleA'.
