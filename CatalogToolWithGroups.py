@@ -119,7 +119,7 @@ if not _cmf_localroles_patch:
                 dict = object.__ac_local_roles__ or {}
                 if callable(dict):
                     dict = dict()
-                    obj_url = utool.getRelativeUrl(object)
+                obj_url = utool.getRelativeUrl(object)
                 for k, v in dict.items():
                     if withgroups:
                         k = 'user:'+k # groups
@@ -133,7 +133,7 @@ if not _cmf_localroles_patch:
                     dict = object.__ac_local_group_roles__ or {}
                     if callable(dict):
                         dict = dict()
-                        obj_url = utool.getRelativeUrl(object)
+                    obj_url = utool.getRelativeUrl(object)
                     for k, v in dict.items():
                         k = 'group:'+k
                         if merged.has_key(k):
