@@ -10,7 +10,7 @@
 
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, DEBUG
+from zLOG import LOG, INFO
 
 from AccessControl.PermissionRole import rolesForPermissionOn
 
