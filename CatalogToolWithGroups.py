@@ -100,7 +100,10 @@ def _getAllowedRolesAndUsers(user):
     # deal with groups
     getGroups = getattr(user, 'getGroups', None)
     if getGroups is not None:
-        for group in getGroups():
+        groups = self.getGroups() + ('role:Anonymous',)
+        if 'Authenticated' in result:
+            groups = groups + ('role:Authenticated',)
+        for group in groups:
             result.append('group:%s' % group)
     # end groups
     return result
