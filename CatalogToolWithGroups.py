@@ -24,8 +24,27 @@
 
 __version__ = '$Revision$'[11:-2]
 
+# The patching should now be done in CPS. Try to reimport the methods here
+# for compatibility.
 
-def cmfpatch():
+_cmf_localroles_patch = 0
+try:
+    from NuxCPS.utils import _allowedRolesAndUsers, _getAllowedRolesAndUsers
+    from CMFCore.utils import mergedLocalRoles
+    _cmf_localroles_patch = 1
+except ImportError:
+    pass
+
+try:
+    from NuxCPS3.utils import _allowedRolesAndUsers, _getAllowedRolesAndUsers
+    from CMFCore.utils import mergedLocalRoles
+    _cmf_localroles_patch = 1
+except ImportError:
+    pass
+
+if not _cmf_localroles_patch:
+    # This is used outside CPS or with older versions,
+    # so we do the patching here!
     from zLOG import LOG, INFO, DEBUG
 
     from AccessControl.PermissionRole import rolesForPermissionOn
@@ -35,7 +54,7 @@ def cmfpatch():
 
     from Products.CMFCore.utils import getToolByName
 
-    LOG('NuxUserGroups.CatalogToolWithGroups', INFO, 'Patching CatalogTool')
+    LOG('NuxUserGroups.CatalogToolWithGroups', INFO, 'Patching CMF')
 
     def mergedLocalRoles(object, withgroups=0, withpath=0):
         """Return a merging of object and its ancestors' __ac_local_roles__.
@@ -157,13 +176,3 @@ def cmfpatch():
     def _listAllowedRolesAndUsers(self, user):
         return _getAllowedRolesAndUsers(user)
     CatalogTool._listAllowedRolesAndUsers = _listAllowedRolesAndUsers
-
-try:
-    import Products.CPSCore
-    # This is a CPS 3 installation, necessary patching is done in CPSCore.utils
-except ImportError:
-    try:
-        import Products.NuxCPS3
-    except ImportError:
-        cmfpatch()
-    # Not a CPS3 Installation, continue on with patching
