@@ -1,4 +1,25 @@
 *******************************************
+** NuxUserGroups V0.8.0 [R1 build 2003-04/29-08:29 by ben]
+
+ZODB Requires:
+~~~~~~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added the pseudo groups "role:Anonymous" to which everybody belongs,
+  and "role:Authenticated" to which logged-in users belong. This makes
+  it easy to use only local roles instead of changing the
+  role/permission map, for everything that doesn't involve blocking
+  permissions.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Added a patch to MembershipTool to provide the two safe methods
+  setLocalGroupRoles and deleteLocalGroupRoles.
+
+*******************************************
 ** NuxUserGroups V0.7.0
 
 New features:
