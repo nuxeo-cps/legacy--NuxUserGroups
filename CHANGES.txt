@@ -1,0 +1,7 @@
+0.7
+
+  Support for CMF Catalog Tool.
+
+0.6
+
+  Initial release.
