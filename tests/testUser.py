@@ -26,7 +26,7 @@ class TestUser(TestBase):
 
     def testGetUserName(self):
         self.assertEquals(self._user.getUserName(), _user_name)
-    
+
     def testGetId(self):
         self.assertEquals(self._user.getId(), _user_name)
 
@@ -35,7 +35,7 @@ class TestUser(TestBase):
 
     def testGetGroups(self):
         self.assertEquals(self._user.getGroups(), () )
-        
+
     # NB! No property support.
     def testPropertySupport(self):
         # If this changes, the user object must implement
@@ -43,7 +43,7 @@ class TestUser(TestBase):
         self.assertEquals(self.uf.listUserProperties(), 
             ('id', 'roles', 'groups') )
 
-    
+
 if __name__ == '__main__':
     framework(descriptions=0, verbosity=1)
 else:
