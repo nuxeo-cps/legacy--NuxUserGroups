@@ -1,4 +1,21 @@
 *******************************************
+** NuxUserGroups V0.10.0 [R1 build 2004/06/14-08:06 by ben]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Implemented local role blocking. See doc/BLOCKING.txt for specs.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Small speed improvement in local roles computation.
+
+
+*******************************************
 ** NuxUserGroups V0.9.3 [R1 build 2004/02/11-14:27 by ben]
 
 ZODB Requires:
