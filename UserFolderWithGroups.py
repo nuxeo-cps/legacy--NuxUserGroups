@@ -40,6 +40,7 @@ from Globals import InitializeClass, DTMLFile, MessageDialog, \
 from Acquisition import aq_base, Implicit
 from AccessControl import ClassSecurityInfo, Permissions
 from AccessControl.User import UserFolder, _remote_user_mode, reqattr
+from AccessControl.PermissionRole import rolesForPermissionOn
 
 try:
     from AccessControl.User import DEFAULTMAXLISTUSERS
@@ -654,6 +655,95 @@ class UserFolderWithGroups(UserFolder, BasicGroupFolderMixin):
 
         if REQUEST is not None:
             return self._mainUser(self, REQUEST)
+
+
+    def mergedLocalRoles(self, object, withgroups=0, withpath=0):
+        """Return a merging of object and its ancestors' __ac_local_roles__.
+
+        When called with withgroups=1, the keys are
+        of the form user:foo and group:bar.
+        When called with withpath=1, the path corresponding
+        to the object where the role takes place is added
+        with the role in the result. In this case of the form :
+        {'user:foo': [{'url':url, 'roles':[Role0, Role1]},
+                    {'url':url, 'roles':[Role1]}],..}.
+        """
+        # Modified from AccessControl.User.getRolesInContext().
+
+        if withpath:
+            utool = getToolByName(object, 'portal_url')
+        merged = {}
+        object = getattr(object, 'aq_inner', object)
+
+        while 1:
+            if hasattr(object, '__ac_local_roles__'):
+                dict = object.__ac_local_roles__ or {}
+                if callable(dict):
+                    dict = dict()
+                if withpath:
+                    obj_url = utool.getRelativeUrl(object)
+                for k, v in dict.items():
+                    if withgroups:
+                        k = 'user:'+k # groups
+                    if merged.has_key(k):
+                        if withpath:
+                            merged[k].append({'url':obj_url,'roles':v})
+                        else:
+                            merged[k] = merged[k] + v
+                    else:
+                        if withpath:
+                            merged[k] = [{'url':obj_url,'roles':v}]
+                        else:
+                            merged[k] = v
+            # deal with groups
+            if withgroups:
+                if hasattr(object, '__ac_local_group_roles__'):
+                    dict = object.__ac_local_group_roles__ or {}
+                    if callable(dict):
+                        dict = dict()
+                    if withpath:
+                        obj_url = utool.getRelativeUrl(object)
+                    for k, v in dict.items():
+                        k = 'group:'+k
+                        if merged.has_key(k):
+                            if withpath:
+                                merged[k].append({'url':obj_url,'roles':v})
+                            else:
+                                merged[k] = merged[k] + v
+                        else:
+                            if withpath:
+                                merged[k] = [{'url':obj_url,'roles':v}]
+                            else:
+                                merged[k] = v
+            # end groups
+            if hasattr(object, 'aq_parent'):
+                object = object.aq_parent
+                object = getattr(object, 'aq_inner', object)
+                continue
+            if hasattr(object, 'im_self'):
+                object = object.im_self
+                object = getattr(object, 'aq_inner', object)
+                continue
+            break
+
+        return merged
+
+    def _allowedRolesAndUsers(self, ob):
+        """
+        Return a list of roles, users and groups with View permission.
+        Used by PortalCatalog to filter out items you're not allowed to see.
+        """
+        allowed = {}
+        for r in rolesForPermissionOn('View', ob):
+            allowed[r] = 1
+        localroles = self.mergedLocalRoles(ob, withgroups=1) # groups
+        for user_or_group, roles in localroles.items():
+            for role in roles:
+                if allowed.has_key(role):
+                    allowed[user_or_group] = 1
+        if allowed.has_key('Owner'):
+            del allowed['Owner']
+        return list(allowed.keys())
 
 InitializeClass(UserFolderWithGroups)
 

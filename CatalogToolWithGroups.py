@@ -24,66 +24,47 @@
 
 __version__ = '$Revision$'[11:-2]
 
-from zLOG import LOG, INFO, DEBUG
 
-from AccessControl.PermissionRole import rolesForPermissionOn
+def cmfpatch():
+    from zLOG import LOG, INFO, DEBUG
 
-from Products.CMFCore.CatalogTool import IndexableObjectWrapper, \
-     CatalogTool
+    from AccessControl.PermissionRole import rolesForPermissionOn
 
-from Products.CMFCore.utils import getToolByName
+    from Products.CMFCore.CatalogTool import IndexableObjectWrapper, \
+        CatalogTool
 
-LOG('NuxUserGroups.CatalogToolWithGroups', INFO, 'Patching CatalogTool')
+    from Products.CMFCore.utils import getToolByName
 
+    LOG('NuxUserGroups.CatalogToolWithGroups', INFO, 'Patching CatalogTool')
 
-def mergedLocalRoles(object, withgroups=0, withpath=0):
-    """Return a merging of object and its ancestors' __ac_local_roles__.
+    def mergedLocalRoles(object, withgroups=0, withpath=0):
+        """Return a merging of object and its ancestors' __ac_local_roles__.
 
-    When called with withgroups=1, the keys are
-    of the form user:foo and group:bar.
-    When called with withpath=1, the path corresponding
-    to the object where the role takes place is added
-    with the role in the result. In this case of the form :
-    {'user:foo': [{'url':url, 'roles':[Role0, Role1]},
-                  {'url':url, 'roles':[Role1]}],..}.
-    """
-    # Modified from AccessControl.User.getRolesInContext().
+        When called with withgroups=1, the keys are
+        of the form user:foo and group:bar.
+        When called with withpath=1, the path corresponding
+        to the object where the role takes place is added
+        with the role in the result. In this case of the form :
+        {'user:foo': [{'url':url, 'roles':[Role0, Role1]},
+                    {'url':url, 'roles':[Role1]}],..}.
+        """
+        # Modified from AccessControl.User.getRolesInContext().
 
-    if withpath:
-        utool = getToolByName(object, 'portal_url')
-    merged = {}
-    object = getattr(object, 'aq_inner', object)
+        if withpath:
+            utool = getToolByName(object, 'portal_url')
+        merged = {}
+        object = getattr(object, 'aq_inner', object)
 
-    while 1:
-        if hasattr(object, '__ac_local_roles__'):
-            dict = object.__ac_local_roles__ or {}
-            if callable(dict):
-                dict = dict()
-            if withpath:
-                obj_url = utool.getRelativeUrl(object)
-            for k, v in dict.items():
-                if withgroups:
-                    k = 'user:'+k # groups
-                if merged.has_key(k):
-                    if withpath:
-                        merged[k].append({'url':obj_url,'roles':v})
-                    else:
-                        merged[k] = merged[k] + v
-                else:
-                    if withpath:
-                        merged[k] = [{'url':obj_url,'roles':v}]
-                    else:
-                        merged[k] = v
-        # deal with groups
-        if withgroups:
-            if hasattr(object, '__ac_local_group_roles__'):
-                dict = object.__ac_local_group_roles__ or {}
+        while 1:
+            if hasattr(object, '__ac_local_roles__'):
+                dict = object.__ac_local_roles__ or {}
                 if callable(dict):
                     dict = dict()
                 if withpath:
                     obj_url = utool.getRelativeUrl(object)
                 for k, v in dict.items():
-                    k = 'group:'+k
+                    if withgroups:
+                        k = 'user:'+k # groups
                     if merged.has_key(k):
                         if withpath:
                             merged[k].append({'url':obj_url,'roles':v})
@@ -94,65 +75,92 @@ def mergedLocalRoles(object, withgroups=0, withpath=0):
                             merged[k] = [{'url':obj_url,'roles':v}]
                         else:
                             merged[k] = v
+            # deal with groups
+            if withgroups:
+                if hasattr(object, '__ac_local_group_roles__'):
+                    dict = object.__ac_local_group_roles__ or {}
+                    if callable(dict):
+                        dict = dict()
+                    if withpath:
+                        obj_url = utool.getRelativeUrl(object)
+                    for k, v in dict.items():
+                        k = 'group:'+k
+                        if merged.has_key(k):
+                            if withpath:
+                                merged[k].append({'url':obj_url,'roles':v})
+                            else:
+                                merged[k] = merged[k] + v
+                        else:
+                            if withpath:
+                                merged[k] = [{'url':obj_url,'roles':v}]
+                            else:
+                                merged[k] = v
+            # end groups
+            if hasattr(object, 'aq_parent'):
+                object = object.aq_parent
+                object = getattr(object, 'aq_inner', object)
+                continue
+            if hasattr(object, 'im_self'):
+                object = object.im_self
+                object = getattr(object, 'aq_inner', object)
+                continue
+            break
+
+        return merged
+
+
+
+    # belongs to CPS API too
+    def _allowedRolesAndUsers(ob):
+        """
+        Return a list of roles, users and groups with View permission.
+        Used by PortalCatalog to filter out items you're not allowed to see.
+        """
+        allowed = {}
+        for r in rolesForPermissionOn('View', ob):
+            allowed[r] = 1
+        localroles = mergedLocalRoles(ob, withgroups=1) # groups
+        for user_or_group, roles in localroles.items():
+            for role in roles:
+                if allowed.has_key(role):
+                    allowed[user_or_group] = 1
+        if allowed.has_key('Owner'):
+            del allowed['Owner']
+        return list(allowed.keys())
+
+    def allowedRolesAndUsers(self):
+        """
+        Return a list of roles, users and groups with View permission.
+        Used by PortalCatalog to filter out items you're not allowed to see.
+        """
+        ob = self._IndexableObjectWrapper__ob # Eeek, manual name mangling
+        return _allowedRolesAndUsers(ob)
+    IndexableObjectWrapper.allowedRolesAndUsers = allowedRolesAndUsers
+
+
+    # belongs to API too
+    def _getAllowedRolesAndUsers(user):
+        result = list(user.getRoles())
+        result.append('Anonymous')
+        result.append('user:%s' % user.getUserName())
+        # deal with groups
+        getGroups = getattr(user, 'getGroups', None)
+        if getGroups is not None:
+            groups = user.getGroups() + ('role:Anonymous',)
+            if 'Authenticated' in result:
+                groups = groups + ('role:Authenticated',)
+            for group in groups:
+                result.append('group:%s' % group)
         # end groups
-        if hasattr(object, 'aq_parent'):
-            object = object.aq_parent
-            object = getattr(object, 'aq_inner', object)
-            continue
-        if hasattr(object, 'im_self'):
-            object = object.im_self
-            object = getattr(object, 'aq_inner', object)
-            continue
-        break
+        return result
 
-    return merged
+    def _listAllowedRolesAndUsers(self, user):
+        return _getAllowedRolesAndUsers(user)
+    CatalogTool._listAllowedRolesAndUsers = _listAllowedRolesAndUsers
 
-
-
-# belongs to CPS API too
-def _allowedRolesAndUsers(ob):
-    """
-    Return a list of roles, users and groups with View permission.
-    Used by PortalCatalog to filter out items you're not allowed to see.
-    """
-    allowed = {}
-    for r in rolesForPermissionOn('View', ob):
-        allowed[r] = 1
-    localroles = mergedLocalRoles(ob, withgroups=1) # groups
-    for user_or_group, roles in localroles.items():
-        for role in roles:
-            if allowed.has_key(role):
-                allowed[user_or_group] = 1
-    if allowed.has_key('Owner'):
-        del allowed['Owner']
-    return list(allowed.keys())
-
-def allowedRolesAndUsers(self):
-    """
-    Return a list of roles, users and groups with View permission.
-    Used by PortalCatalog to filter out items you're not allowed to see.
-    """
-    ob = self._IndexableObjectWrapper__ob # Eeek, manual name mangling
-    return _allowedRolesAndUsers(ob)
-IndexableObjectWrapper.allowedRolesAndUsers = allowedRolesAndUsers
-
-
-# belongs to API too
-def _getAllowedRolesAndUsers(user):
-    result = list(user.getRoles())
-    result.append('Anonymous')
-    result.append('user:%s' % user.getUserName())
-    # deal with groups
-    getGroups = getattr(user, 'getGroups', None)
-    if getGroups is not None:
-        groups = user.getGroups() + ('role:Anonymous',)
-        if 'Authenticated' in result:
-            groups = groups + ('role:Authenticated',)
-        for group in groups:
-            result.append('group:%s' % group)
-    # end groups
-    return result
-
-def _listAllowedRolesAndUsers(self, user):
-    return _getAllowedRolesAndUsers(user)
-CatalogTool._listAllowedRolesAndUsers = _listAllowedRolesAndUsers
+try:
+    import Products.CPSCore
+    # This is a CPS 3 installation, necessary patching is done in CPSCore.utils
+except ImportError:
+    # Not a CPS3 Installation, continue on with patching
+    cmfpatch()
