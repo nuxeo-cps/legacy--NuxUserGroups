@@ -72,10 +72,10 @@ BasicUser._delGroups__roles__ = () # Private
 # Patch local roles treatment in BasicUser to support groups.
 #
 
-def hasLocalRoleBlocking(self):
+def hasLocalRolesBlocking(self):
     return 1
-BasicUser.hasLocalRoleBlocking = hasLocalRoleBlocking
-BasicUser.hasLocalRoleBlocking__roles__ = None # Public
+BasicUser.hasLocalRolesBlocking = hasLocalRolesBlocking
+BasicUser.hasLocalRolesBlocking__roles__ = None # Public
 
 
 def getRolesInContext(self, object):
