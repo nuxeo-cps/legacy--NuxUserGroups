@@ -21,7 +21,7 @@ from AccessControl.PermissionRole import PermissionRole
 from AccessControl.Role import RoleManager
 
 
-LOG('LocalRolesWithGroups', INFO, 'Patching RoleManager')
+LOG('NuxUserGroups.LocalRolesWithGroups', INFO, 'Patching RoleManager')
 
 
 __ac_local_group_roles__ = None

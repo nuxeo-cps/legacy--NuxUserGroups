@@ -18,6 +18,9 @@ from Products.CMFCore.CatalogTool import IndexableObjectWrapper, \
      CatalogTool
 
 
+LOG('NuxUserGroups.CatalogToolWithGroups', INFO, 'Patching CatalogTool')
+
+
 def mergedLocalRoles(object, withgroups=0):
     """Returns a merging of object and its ancestors'
     __ac_local_roles__.

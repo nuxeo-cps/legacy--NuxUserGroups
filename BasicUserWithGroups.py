@@ -20,7 +20,7 @@ from AccessControl.User import BasicUser, BasicUserFolder, \
 from AccessControl.PermissionRole import _what_not_even_god_should_do
 
 
-LOG("BasicUserWithGroups", INFO, "Patching BasicUser")
+LOG("NuxUserGroups.BasicUserWithGroups", INFO, "Patching BasicUser")
 
 
 #
