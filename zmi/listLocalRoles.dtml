@@ -11,6 +11,9 @@
 <p class="form-help">
 Local roles allow you to give particular users or groups extra roles in the context 
 of this object, in addition to the roles they already have. 
+
+You also have the possibility to <strong>block</strong> local roles, by
+using roles prefixed with '-'. The role '-' itself blocks all local roles.
 </p>
 
 <dtml-if has_local_roles>
@@ -93,6 +96,7 @@ to the name of the group and click the <em>Remove</em> button.
 To give a user extra roles when accessing this object (and its children), 
 select a user from the <em>User</em> list below, select the extra 
 roles that should be given to that user from the <em>Roles</em> list.
+To block roles, use the roles prefixed by '-'.
 </p>
 
 <form action="manage_setLocalRoles" method="POST">
@@ -135,6 +139,12 @@ roles that should be given to that user from the <em>Roles</em> list.
  sequence-item></option>
 </dtml-if>
 </dtml-in>
+<option value="-">-</option>
+<dtml-in valid_roles><dtml-if
+"_['sequence-item'] not in ('Anonymous', 'Shared', 'Authenticated')">
+<option value="-&dtml-sequence-item;">-&dtml-sequence-item;</option>
+</dtml-if>
+</dtml-in>
   </select>
   </div>
   </td>
@@ -156,6 +166,7 @@ roles that should be given to that user from the <em>Roles</em> list.
 To give a group extra roles when accessing this object (and its children), 
 select a group from the <em>Group</em> list below, select the extra 
 roles that should be given to that group from the <em>Roles</em> list.
+To block roles, use the roles prefixed by '-'.
 </p>
 
 <form action="manage_setLocalGroupRoles" method="POST">
@@ -193,6 +204,12 @@ roles that should be given to that group from the <em>Roles</em> list.
 <dtml-in valid_roles><dtml-if 
 "_['sequence-item'] not in ('Anonymous', 'Shared', 'Authenticated')">
 <option value="&dtml-sequence-item;">&dtml-sequence-item;</option>
+</dtml-if>
+</dtml-in>
+<option value="-">-</option>
+<dtml-in valid_roles><dtml-if
+"_['sequence-item'] not in ('Anonymous', 'Shared', 'Authenticated')">
+<option value="-&dtml-sequence-item;">-&dtml-sequence-item;</option>
 </dtml-if>
 </dtml-in>
   </select>

@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Implemented local role blocking. See doc/BLOCKING.txt for specs.
 Bug fixes:
 ~~~~~~~~~~
 -

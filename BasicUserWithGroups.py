@@ -72,6 +72,12 @@ BasicUser._delGroups__roles__ = () # Private
 # Patch local roles treatment in BasicUser to support groups.
 #
 
+def hasLocalRoleBlocking(self):
+    return 1
+BasicUser.hasLocalRoleBlocking = hasLocalRoleBlocking
+BasicUser.hasLocalRoleBlocking__roles__ = None # Public
+
+
 def getRolesInContext(self, object):
     """Return the list of roles assigned to the user,
        including local roles assigned in context of
@@ -84,25 +90,42 @@ def getRolesInContext(self, object):
         groups = groups + ('role:Authenticated',)
     # end groups
     local = {}
+    stop_loop = 0
     object = getattr(object, 'aq_inner', object)
     while 1:
+        # Collect all roles info
+        lrd = {}
         local_roles = getattr(object, '__ac_local_roles__', None)
         if local_roles:
             if callable(local_roles):
-                local_roles = local_roles()
-            dict = local_roles or {}
-            for r in dict.get(name, []):
-                local[r] = 1
-        # deal with groups
+                local_roles = local_roles() or {}
+            for r in local_roles.get(name, []):
+                lrd[r] = None
         local_group_roles = getattr(object, '__ac_local_group_roles__', None)
         if local_group_roles:
             if callable(local_group_roles):
-                local_group_roles = local_group_roles()
-            dict = local_group_roles or {}
+                local_group_roles = local_group_roles() or {}
             for g in groups:
-                for r in dict.get(g, []):
-                    local[r] = 1
-        # end groups
+                for r in local_group_roles.get(g, []):
+                    lrd[r] = None
+        lr = lrd.keys()
+        # Positive role assertions
+        for r in lr:
+            if not r.startswith('-'):
+                if not local.has_key(r):
+                    local[r] = 1 # acquired role
+        # Negative (blocking) role assertions
+        for r in lr:
+            if r.startswith('-'):
+                r = r[1:]
+                if not r:
+                    # role '-' blocks all acquisition
+                    stop_loop = 1
+                    break
+                if not local.has_key(r):
+                    local[r] = 0 # blocked role
+        if stop_loop:
+            break
         inner = getattr(object, 'aq_inner', object)
         parent = getattr(inner, 'aq_parent', None)
         if parent is not None:
@@ -113,12 +136,53 @@ def getRolesInContext(self, object):
             object = getattr(object, 'aq_inner', object)
             continue
         break
-    roles = list(roles) + local.keys()
+    roles = list(roles)
+    for r, v in local.items():
+        if v: # only if not blocked
+            roles.append(r)
     return roles
 BasicUser.getRolesInContext = getRolesInContext
 
 
 def allowed(self, object, object_roles=None):
+    """Check whether the user has access to object. The user must
+       have one of the roles in object_roles to allow access."""
+
+    if object_roles is _what_not_even_god_should_do:
+        return 0
+
+    # Short-circuit the common case of anonymous access.
+    if object_roles is None or 'Anonymous' in object_roles:
+        return 1
+
+    # Provide short-cut access if object is protected by 'Authenticated'
+    # role and user is not nobody
+    if 'Authenticated' in object_roles and (
+        self.getUserName() != 'Anonymous User'):
+        return 1
+
+    # Check for a role match with the normal roles given to
+    # the user, then with local roles only if necessary. We
+    # want to avoid as much overhead as possible.
+    user_roles = self.getRoles()
+    for role in object_roles:
+        if role in user_roles:
+            if self._check_context(object):
+                return 1
+            return None
+
+    # Check local roles, calling getRolesInContext to avoid too much
+    # complexity, at the expense of speed.
+    for role in self.getRolesInContext(object):
+        if role in object_roles:
+            return 1
+
+    return None
+
+BasicUser.allowed = allowed
+
+
+def allowed_OLD(self, object, object_roles=None):
     """Check whether the user has access to object. The user must
        have one of the roles in object_roles to allow access."""
 
@@ -201,4 +265,4 @@ def allowed(self, object, object_roles=None):
             continue
         break
     return None
-BasicUser.allowed = allowed
+# end allowed_OLD

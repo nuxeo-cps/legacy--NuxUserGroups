@@ -1,4 +1,4 @@
-This product adds the notion of groups of users.
+This product adds the notion of groups of users, and local roles blocking.
 
 Groups provide a level of indirection in the user -> roles mapping,
 which gives greater flexibility.
@@ -99,6 +99,14 @@ Product internals
     is needed because the Catalog Tool automatically filters the objects
     returned from a catalog query to keep only those on which the user
     has View permission.
+
+Local roles blocking
+
+  This features makes it possible to block local roles, by using special
+  roles prefixed with '-'. See doc/BLOCKING.txt for more information.
+
+  For instance, to block all acquisition of local roles, give the role
+  '-' to the group 'role:Anonymous'.
 
 Caveat
 
