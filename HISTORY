@@ -1,0 +1,19 @@
+*******************************************
+** NuxUserGroups V0.7.0
+
+New features:
+~~~~~~~~~~~~~
+- Support for CMF Catalog Tool.
+
+*******************************************
+** NuxUserGroups V0.6.0
+
+New features:
+~~~~~~~~~~~~~
+- First public release.
+- Groups are now a in separate class.
+
+*******************************************
+** NuxUserGroups V0.5.0
+
+- First working version
