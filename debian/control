@@ -1,0 +1,27 @@
+Source: zope-nuxusergroups
+Section: web
+Priority: extra
+Maintainer: Encolpe DEGOUTE <encolpe@colpi.info>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.6.0
+
+Package: zope-nuxusergroups
+Architecture: all
+Depends: debconf, zope
+Suggests: zope-cmfcps
+Description: A Zope UserFolder with groups support
+ This product adds the notion of groups of users.
+ .
+ Groups provide a level of indirection in the user -> roles
+ mapping, which gives greater flexibility.
+ .
+ The groups are defined and managed in the User Folder. 
+ They are then used at the local roles level, where you can
+ define an additionnal mapping of groups -> roles, thus
+ giving the users who belong to these groups additionnal
+ local roles.
+ .
+ Two special groups, 'role:Anonymous' and
+ 'role:Authenticated', are always available in local roles
+ and represent respectively all the users (including
+ anonymous), and the successfully authenticated ones.
