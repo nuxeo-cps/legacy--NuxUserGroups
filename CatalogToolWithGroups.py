@@ -24,8 +24,8 @@ LOG('NuxUserGroups.CatalogToolWithGroups', INFO, 'Patching CatalogTool')
 def mergedLocalRoles(object, withgroups=0):
     """Returns a merging of object and its ancestors'
     __ac_local_roles__.
-    When called with withgroups=1, the keys are
-    of the form user:foo and group:bar."""
+    When called with withgroups=1, add group keys
+    of the form _group_:bar."""
     # Modified from AccessControl.User.getRolesInContext().
     merged = {}
     object = getattr(object, 'aq_inner', object)
@@ -34,7 +34,6 @@ def mergedLocalRoles(object, withgroups=0):
             dict = object.__ac_local_roles__ or {}
             if callable(dict): dict = dict()
             for k, v in dict.items():
-                if withgroups: k = 'user:'+k # groups
                 if merged.has_key(k):
                     merged[k] = merged[k] + v
                 else:
@@ -45,7 +44,7 @@ def mergedLocalRoles(object, withgroups=0):
                 dict = object.__ac_local_group_roles__ or {}
                 if callable(dict): dict = dict()
                 for k, v in dict.items():
-                    k = 'group:'+k
+                    k = '_group_:'+k
                     if merged.has_key(k):
                         merged[k] = merged[k] + v
                     else:
@@ -86,12 +85,12 @@ IndexableObjectWrapper.allowedRolesAndUsers = allowedRolesAndUsers
 def _listAllowedRolesAndUsers(self, user):
     result = list(user.getRoles())
     result.append('Anonymous')
-    result.append('user:%s' % user.getUserName())
+    result.append(user.getUserName())
     # deal with groups
     getGroups = getattr(user, 'getGroups', None)
     if getGroups is not None:
         for group in getGroups():
-            result.append('group:%s' % group)
+            result.append('_group_:%s' % group)
     # end groups
     return result
 CatalogTool._listAllowedRolesAndUsers = _listAllowedRolesAndUsers
