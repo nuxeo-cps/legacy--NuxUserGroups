@@ -5,19 +5,19 @@
 
 #from ZClasses import createZClassForBase
 
-from Userwithgroups import UserwithgroupsFolder, addUserwithgroupsFolder
+from UserFolderWithGroups import UserFolderWithGroups, addUserFolderWithGroups
+import BasicUserWithGroups
+import LocalRolesWithGroups
 
-import Localgrouproles
-
-#createZClassForBase(UserwithgroupsFolder, globals(),
-#                    'ZUserwithgroupsFolder', 'Userwithgroups Folder')
+#createZClassForBase(GroupFolder, globals(),
+#                    'ZGroupFolder', 'Group Folder')
 
 def initialize(registrar):
     registrar.registerClass(
-        UserwithgroupsFolder,
+        UserFolderWithGroups,
         permission='Add User Folders',
-        constructors=(addUserwithgroupsFolder,),
-        icon='UserFolder_icon.gif', # XXX change image ?
+        constructors=(addUserFolderWithGroups,),
+        icon='UserFolder_icon.gif',
         )
 
 

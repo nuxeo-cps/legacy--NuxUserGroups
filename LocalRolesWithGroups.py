@@ -4,9 +4,8 @@
 # $Id$
 
 """
-  Localgrouproles
-  This monkey-patches the local roles support
-  to add group knowledge.
+  LocalRolesWithGroups
+  Patches the local roles support in RoleManager to add groups support.
 """
 
 __version__ = '$Revision$'[11:-2]
@@ -16,21 +15,17 @@ import string, re, urllib, os
 from zLOG import LOG, INFO
 from Globals import InitializeClass, DTMLFile
 from Acquisition import aq_base
+from AccessControl.Permissions import change_permissions
+from AccessControl.PermissionRole import PermissionRole
 
 from AccessControl.Role import RoleManager
 
 
+LOG('LocalRolesWithGroups', INFO, 'Patching RoleManager')
+
+
 __ac_local_group_roles__ = None
 RoleManager.__ac_local_group_roles__ = __ac_local_group_roles__
-
-
-# added
-__ac_permissions__ = (
-    ('Change permissions',
-     ('manage_setLocalGroupRoles', 'manage_addLocalGroupRoles',
-      'manage_delLocalGroupRoles',
-      )),
-    )
 
 
 # override
@@ -41,9 +36,11 @@ manage_listLocalRoles=DTMLFile('zmi/listLocalRoles', globals(),
 RoleManager.manage_listLocalRoles = manage_listLocalRoles
 
 
+# new management page
 manage_editLocalGroupRoles=DTMLFile('zmi/editLocalGroupRoles', globals(),
                                     management_view='Security')
 RoleManager.manage_editLocalGroupRoles = manage_editLocalGroupRoles
+RoleManager.manage_editLocalGroupRoles__roles__ = PermissionRole(change_permissions)
 
 
 # used by listLocalRoles
@@ -51,6 +48,7 @@ def has_local_group_roles(self):
     dict=self.__ac_local_group_roles__ or {}
     return len(dict)
 RoleManager.has_local_group_roles = has_local_group_roles
+RoleManager.has_local_group_roles__roles__ = PermissionRole(change_permissions)
 
 
 # used by listLocalRoles
@@ -64,6 +62,7 @@ def get_local_group_roles(self):
         info.append((key, value))
     return tuple(info)
 RoleManager.get_local_group_roles = get_local_group_roles
+RoleManager.get_local_group_roles__roles__ = PermissionRole(change_permissions)
 
 
 # used where ?
@@ -71,27 +70,29 @@ def groups_with_local_role(self, role):
     got = {}
     for group, roles in self.get_local_group_roles():
         if role in roles:
-            got[group] = 1
+            got[group] = None
     return got.keys()
 RoleManager.groups_with_local_role = groups_with_local_role
+RoleManager.groups_with_local_role__roles__ = PermissionRole(change_permissions)
 
 
 # used by listLocalRoles
 def get_valid_groupids(self):
-    item=self
-    dict={}
+    item = self
+    dict = {}
     while 1:
         if hasattr(aq_base(item), 'acl_users') and \
-           hasattr(item.acl_users, 'listGroupNames'):
-            for name in item.acl_users.listGroupNames():
-                dict[name]=1
+           hasattr(item.acl_users, 'getGroupNames'):
+            for name in item.acl_users.getGroupNames():
+                dict[name] = None
         if not hasattr(item, 'aq_parent'):
             break
         item = item.aq_parent
-    keys=dict.keys()
+    keys = dict.keys()
     keys.sort()
     return tuple(keys)
 RoleManager.get_valid_groupids = get_valid_groupids
+RoleManager.get_valid_groupids__roles__ = PermissionRole(change_permissions)
 
 
 # used by editLocalGroupRoles
@@ -99,6 +100,7 @@ def get_local_roles_for_groupid(self, groupid):
     dict=self.__ac_local_group_roles__ or {}
     return tuple(dict.get(groupid, []))
 RoleManager.get_local_roles_for_groupid = get_local_roles_for_groupid
+RoleManager.get_local_roles_for_groupid__roles__ = PermissionRole(change_permissions)
 
 
 def manage_addLocalGroupRoles(self, groupid, roles=[], REQUEST=None):
@@ -116,6 +118,7 @@ def manage_addLocalGroupRoles(self, groupid, roles=[], REQUEST=None):
         stat='Your changes have been saved.'
         return self.manage_listLocalRoles(self, REQUEST, stat=stat)
 RoleManager.manage_addLocalGroupRoles = manage_addLocalGroupRoles
+RoleManager.manage_addLocalGroupRoles__roles__ = PermissionRole(change_permissions)
 
 
 def manage_setLocalGroupRoles(self, groupid, roles=[], REQUEST=None):
@@ -129,6 +132,7 @@ def manage_setLocalGroupRoles(self, groupid, roles=[], REQUEST=None):
         stat='Your changes have been saved.'
         return self.manage_listLocalRoles(self, REQUEST, stat=stat)
 RoleManager.manage_setLocalGroupRoles = manage_setLocalGroupRoles
+RoleManager.manage_setLocalGroupRoles__roles__ = PermissionRole(change_permissions)
 
 
 def manage_delLocalGroupRoles(self, groupids, REQUEST=None):
@@ -142,18 +146,7 @@ def manage_delLocalGroupRoles(self, groupids, REQUEST=None):
         stat='Your changes have been saved.'
         return self.manage_listLocalRoles(self, REQUEST, stat=stat)
 RoleManager.manage_delLocalGroupRoles = manage_delLocalGroupRoles
-
-
-
-
-
-if getattr(RoleManager, '__patched_by_localgrouproles', 0):
-    LOG('Localgrouproles', INFO, 'RoleManager already patched before this refresh')
-else:
-    RoleManager.__patched_by_localgrouproles = 1
-    RoleManager.__ac_permissions__ = __ac_permissions__ + \
-                                     RoleManager.__ac_permissions__
-    LOG('Localgrouproles', INFO, 'Patching RoleManager')
+RoleManager.manage_delLocalGroupRoles__roles__ = PermissionRole(change_permissions)
 
 
 # This program is free software; you can redistribute it and/or modify

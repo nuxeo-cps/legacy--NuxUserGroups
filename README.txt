@@ -1,4 +1,4 @@
-NuxUserwithgroups
+NuxUserGroups
 
   This product adds the notion of groups of users.
 
@@ -8,11 +8,13 @@ NuxUserwithgroups
 
   The product:
 
-    - defines a new UserFolder, called UserwithgroupsFolder, where
+    - defines a new UserFolder, called UserFolderWithGroups, where
       you can define the groups and what users belong to what groups,
 
-    - provides an additionnal interface in the local roles management
-      page of the ZMI to define what groups have what local roles
-      (monkeypatch),
+    - patches BasicUser to add group support methods,
 
-    - patches the local role machinery to take into account the groups.
+    - patches the the local roles management pages of the ZMI to
+      define what groups have what local roles,
+
+    - patches the local role machinery in BasicUser to take into
+      account the groups when computing local roles.

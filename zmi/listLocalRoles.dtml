@@ -15,7 +15,7 @@ of this object, in addition to the roles they already have.
 
 <dtml-if has_local_roles>
 <p class="form-help">
-The following users have been given local roles. To modify the local roles 
+The following <strong>users</strong> have been given local roles. To modify the local roles 
 given to a particular user, click on the name of the user. To remove all 
 local roles from a user, select the checkbox next to the name of the user 
 and click the <em>Remove</em> button.
@@ -191,9 +191,8 @@ roles that should be given to that group from the <em>Roles</em> list.
   <div class="form-element">
   <select name="roles:list" size="5" multiple>
 <dtml-in valid_roles><dtml-if 
-"_vars['sequence-item'] not in ('Anonymous', 'Shared', 'Authenticated')">
-<option value="<dtml-var sequence-item html_quote>"><dtml-var 
- sequence-item></option>
+"_['sequence-item'] not in ('Anonymous', 'Shared', 'Authenticated')">
+<option value="&dtml-sequence-item;">&dtml-sequence-item;</option>
 </dtml-if>
 </dtml-in>
   </select>

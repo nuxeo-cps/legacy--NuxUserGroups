@@ -96,10 +96,10 @@ Domains
   <td align="left" valign="top">
   <div class="form-element">
   <select name="groupnames:list" size="5" multiple>
-  <dtml-in listGroupNames>
+  <dtml-in getGroupNames>
   <option value="<dtml-var sequence-item html_quote>"><dtml-var 
    sequence-item>
-  </dtml-in listGroupNames>
+  </dtml-in getGroupNames>
   </select>
   <br />
   <input type="submit" name="submit" value="Add" />

@@ -25,18 +25,17 @@ Save Changes</em> button.
 </tr>
 <tr>
   <td align="left" valign="top">
-  <div class="form-text"><dtml-var groupid></div>
+  <div class="form-text">&dtml-groupid;</div>
   </td>
   <td align="left" valign="top">
   <div class="form-element">
-  <input type="hidden" name="groupid" value="<dtml-var groupid html_quote>">
+  <input type="hidden" name="groupid" value="&dtml-groupid;">
 <dtml-with "_(group_roles=get_local_roles_for_groupid(groupid))">
   <select name="roles:list" size="5" multiple>
 <dtml-in valid_roles><dtml-if 
-"_vars['sequence-item'] not in ('Anonymous', 'Shared', 'Authenticated')">
-<option value="<dtml-var sequence-item html_quote>"<dtml-if 
-"_['sequence-item'] in group_roles"> selected</dtml-if>><dtml-var 
-sequence-item>
+"_['sequence-item'] not in ('Anonymous', 'Shared', 'Authenticated')">
+<option value="&dtml-sequence-item;"<dtml-if 
+"_['sequence-item'] in group_roles"> selected</dtml-if>>&dtml-sequence-item;
 </dtml-if>
 </dtml-in>
   </select>
